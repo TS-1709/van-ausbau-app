@@ -489,9 +489,62 @@ body > * { position: relative; z-index: 1; }
 <div class="tab" onclick="gt('T',this)"><span class="ico">✅</span>Aufgaben</div>
 <div class="tab" onclick="gt('P',this)"><span class="ico">🎒</span>Packen</div>
 <div class="tab" onclick="gt('C',this)"><span class="ico">🌍</span>Länder</div>
-<div class="tab" onclick="gt('N',this)"><span class="ico">📝</span>Mehr</div>
+<div class="tab" onclick="gt('R',this)"><span class="ico">🧮</span>Rechner</div>
+<div class="tab" onclick="gt('R',this)"><span class="ico">🧮</span>Rechner</div><div class="tab" onclick="gt('N',this)"><span class="ico">📝</span>Mehr</div>
 </div>
 
+
+<div class="pg" id="pR">
+<div class="hdr"><h1>🧮 Rechner</h1><div class="sub">Spritkosten & Autarkie</div></div>
+
+<div class="glass" style="margin-bottom:14px">
+<div style="font-size:20px;font-weight:700;margin-bottom:14px">⛽ Spritkosten-Rechner</div>
+<div class="field"><label>Verbrauch (L/100km)</label><input type="number" id="fuelCon" value="10.5" step="0.1" inputmode="decimal"></div>
+<div class="field"><label>Geplante Route (km gesamt)</label><input type="number" id="fuelDist" placeholder="z.B. 3000" inputmode="decimal"></div>
+<div id="fuelResult" style="margin-top:12px"></div>
+<div style="margin-top:12px">
+<div style="font-size:14px;font-weight:600;margin-bottom:8px">Spritpreise nach Land (€/L)</div>
+<div id="fuelPrices"></div>
+</div>
+</div>
+
+<div class="glass">
+<div style="font-size:20px;font-weight:700;margin-bottom:14px">🔋 Autarkie-Rechner</div>
+<div style="font-size:13px;color:var(--t2);margin-bottom:12px">Wie lange kommst du ohne Landstrom klar?</div>
+<div class="field"><label>Batterie (Ah)</label><input type="number" id="batAh" value="100" inputmode="decimal"></div>
+<div class="field"><label>Solarpanel (W Peak)</label><input type="number" id="solarW" value="400" inputmode="decimal"></div>
+<div class="field"><label>Wassertank (Liter)</label><input type="number" id="waterL" value="30" inputmode="decimal"></div>
+<div class="field"><label>Personen</label><input type="number" id="persons" value="4" inputmode="decimal"></div>
+<button class="btn-primary" onclick="calcAutarkie()" style="margin-top:8px">⚡ Berechnen</button>
+<div id="autarkieResult" style="margin-top:14px"></div>
+</div>
+
+<div class="glass" style="margin-top:14px">
+<div style="font-size:20px;font-weight:700;margin-bottom:14px">💶 Gesamtkosten-Schätzung</div>
+<div id="totalEstimate"></div>
+</div>
+</div>
+<div class="pg" id="pR">
+<div class="hdr"><h1>🧮 Rechner</h1><div class="sub">Sprit & Autarkie</div></div>
+<div class="glass">
+<div style="font-size:20px;font-weight:700;margin-bottom:14px">⛽ Spritkosten</div>
+<div class="field"><label>Verbrauch (L/100km)</label><input type="number" id="fuelCon" value="10.5" step="0.1"></div>
+<div class="field"><label>Strecke gesamt (km)</label><input type="number" id="fuelDist" placeholder="z.B. 3000"></div>
+<div id="fuelResult" style="margin-top:12px"></div>
+</div>
+<div class="glass" style="margin-top:14px">
+<div style="font-size:20px;font-weight:700;margin-bottom:14px">🔋 Autarkie</div>
+<div class="field"><label>Batterie (Ah)</label><input type="number" id="batAh" value="100"></div>
+<div class="field"><label>Solar (W Peak)</label><input type="number" id="solarW" value="400"></div>
+<div class="field"><label>Wasser (Liter)</label><input type="number" id="waterL" value="30"></div>
+<button class="btn-primary" onclick="calcAutarkie()">⚡ Berechnen</button>
+<div id="autoResult" style="margin-top:14px"></div>
+</div>
+<div class="glass" style="margin-top:14px">
+<div style="font-size:20px;font-weight:700;margin-bottom:14px">💶 Gesamtkosten</div>
+<div id="totalEst"></div>
+</div>
+</div>
 <div class="overlay" id="mI"><div class="sheet">
 <h2 id="mT">Bearbeiten</h2>
 <div class="field"><label>Was?</label><input type="text" id="fN"></div>
@@ -652,5 +705,189 @@ function exportCSV(){let csv="Position,Preis,Kategorie,Bezahlt,Erledigt\n";D.ite
 function exportJSON(){const b=new Blob([JSON.stringify(D,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="van-roadtrip-backup.json";a.click();toast("💾 Backup erstellt","success")}
 
 function toast(m,c){const t=document.getElementById("toast");t.textContent=m;t.className="toast "+c+" show";setTimeout(()=>t.className="toast",2200)}
+
+// Fuel Calculator
+function calcFuel(){
+  const con=parseFloat(document.getElementById("fuelCon").value)||10.5;
+  const dist=parseFloat(document.getElementById("fuelDist").value)||0;
+  if(!dist){document.getElementById("fuelResult").innerHTML='<div style="color:var(--t2)">Strecke eingeben...</div>';return}
+  const prices=D.fuel?D.fuel.prices:{"Deutschland":1.65};
+  const liters=(dist/100)*con;
+  let h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+  h+='<div class="stat-card"><div class="stat-val" style="color:var(--orange)">'+liters.toFixed(0)+' L</div><div class="stat-lbl">Brauchst du</div></div>';
+  const avgPrice=Object.values(prices).reduce((s,v)=>s+v,0)/Object.values(prices).length;
+  const costAvg=liters*avgPrice;
+  h+='<div class="stat-card"><div class="stat-val" style="color:var(--green)">'+costAvg.toFixed(0)+' €</div><div class="stat-lbl">Ø Sprit</div></div>';
+  h+='</div>';
+  h+='<div style="font-size:13px;color:var(--t2);margin-bottom:6px">Nach Land:</div>';
+  Object.entries(prices).forEach(([country,price])=>{
+    const c=liters*price;
+    h+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:.5px solid rgba(255,255,255,0.05);font-size:14px"><span>'+country+'</span><span style="font-weight:700">'+c.toFixed(0)+' € <span style="color:var(--t2);font-weight:400">('+price.toFixed(2)+'€/L)</span></span></div>';
+  });
+  document.getElementById("fuelResult").innerHTML=h;
+}
+
+function showFuelPrices(){
+  const prices=D.fuel?D.fuel.prices:{};
+  let h='';
+  Object.entries(prices).forEach(([country,price])=>{
+    h+='<div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:.5px solid rgba(255,255,255,0.04)"><span>'+country+'</span><span style="color:var(--orange);font-weight:600">'+price.toFixed(2)+' €/L</span></div>';
+  });
+  document.getElementById("fuelPrices").innerHTML=h;
+}
+
+// Autarkie Calculator
+function calcAutarkie(){
+  const ah=parseFloat(document.getElementById("batAh").value)||100;
+  const solar=parseFloat(document.getElementById("solarW").value)||400;
+  const water=parseFloat(document.getElementById("waterL").value)||30;
+  const persons=parseInt(document.getElementById("persons").value)||4;
+
+  // Battery: usable 80% of capacity
+  const usableWh=ah*12.8*0.8;
+  const consumptionW=150; // average fridge+lights+charging
+  const hoursOnBattery=usableWh/consumptionW;
+  const daysOnBattery=hoursOnBattery/24;
+
+  // Solar: ~4 effective hours in summer Europe
+  const solarDailyWh=solar*4;
+  const solarSurplus=solarDailyWh-consumptionW*24;
+  const solarDays=solarSurplus>0?999:usableWh/(consumptionW*24-solarDailyWh);
+
+  // Water
+  const waterPerDay=persons*2.5; // 2.5L per person drinking + cooking
+  const waterDays=water/waterPerDay;
+
+  let h='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">';
+
+  const battDays=Math.min(daysOnBattery,99);
+  const battColor=battDays>2?"var(--green)":battDays>1?"var(--orange)":"var(--red)";
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+battColor+'">'+battDays.toFixed(1)+'</div><div class="stat-lbl">Tage Batterie</div></div>';
+
+  const solDays=Math.min(solarDays,99);
+  const solColor=solDays>5?"var(--green)":solDays>2?"var(--orange)":"var(--red)";
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+solColor+'">'+(solDays>10?'∞':solDays.toFixed(1))+'</div><div class="stat-lbl">Tage Solar</div></div>';
+
+  const wColor=waterDays>3?"var(--green)":waterDays>1.5?"var(--orange)":"var(--red)";
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+wColor+'">'+waterDays.toFixed(1)+'</div><div class="stat-lbl">Tage Wasser</div></div>';
+  h+='</div>';
+
+  // Bottleneck
+  const minDays=Math.min(battDays,solarDays>10?99:solarDays,waterDays);
+  const bottleneck=minDays===battDays?"Batterie":minDays===waterDays?"Wasser":"Solar";
+  h+='<div style="margin-top:14px;padding:14px;background:rgba(255,159,10,0.1);border-radius:14px;border:1px solid rgba(255,159,10,0.2)">';
+  h+='<div style="font-size:14px;font-weight:700;color:var(--orange)">⚠️ Flaschenhals: '+bottleneck+'</div>';
+  h+='<div style="font-size:13px;color:var(--t2);margin-top:4px">Maximal autark: ~'+minDays.toFixed(1)+' Tage</div>';
+  h+='</div>';
+
+  // Tips
+  h+='<div style="margin-top:12px;font-size:13px;color:var(--t2);line-height:1.5">';
+  if(battDays<2) h+='💡 Tipp: Mehr Batterie oder weniger Verbrauch (LED-Lampen, effiziente Kühlbox)<br>';
+  if(waterDays<2) h+='💡 Tipp: Größerer Wassertank oder Wasserfilter für Wildcamping<br>';
+  if(solarDays<3) h+='💡 Tipp: Mehr Solarpanels oder fahre tagsüber nach (Ladebooster lädt)<br>';
+  h+='</div>';
+
+  document.getElementById("autarkieResult").innerHTML=h;
+
+  // Total estimate
+  const totalBudget=D.budget||5000;
+  const totalItems=D.items.reduce((s,i)=>s+i.price,0);
+  const con=parseFloat(document.getElementById("fuelCon").value)||10.5;
+  const dist=parseFloat(document.getElementById("fuelDist").value)||3000;
+  const avgP=D.fuel?Object.values(D.fuel.prices).reduce((s,v)=>s+v,0)/Object.values(D.fuel.prices).length:1.65;
+  const fuelCost=(dist/100)*con*avgP;
+  const vignetten=9.90+40+15; // AT+CH+SI minimum
+  const campingPerNight=25; // average
+  const nights=14;
+  const campingCost=campingPerNight*nights;
+
+  let t='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  t+='<div class="stat-card"><div class="stat-val">'+totalItems.toFixed(0)+' €</div><div class="stat-lbl">Ausbau</div></div>';
+  t+='<div class="stat-card"><div class="stat-val" style="color:var(--orange)">'+fuelCost.toFixed(0)+' €</div><div class="stat-lbl">Sprit</div></div>';
+  t+='<div class="stat-card"><div class="stat-val">'+vignetten.toFixed(0)+' €</div><div class="stat-lbl">Vignetten</div></div>';
+  t+='<div class="stat-card"><div class="stat-val">'+campingCost.toFixed(0)+' €</div><div class="stat-lbl">'+nights+' Nächte Camp</div></div>';
+  t+='</div>';
+  const grandTotal=totalItems+fuelCost+vignetten+campingCost;
+  t+='<div style="margin-top:12px;padding:16px;background:linear-gradient(135deg,rgba(10,132,255,0.15),rgba(191,90,242,0.1));border-radius:16px;text-align:center">';
+  t+='<div style="font-size:12px;color:var(--t2);text-transform:uppercase;letter-spacing:1px">Geschätzte Gesamtkosten</div>';
+  t+='<div style="font-size:36px;font-weight:800;margin-top:4px">'+grandTotal.toFixed(0)+' €</div>';
+  t+='<div style="font-size:13px;color:'+(grandTotal>totalBudget?'var(--red)':'var(--green)')+'">'+(grandTotal>totalBudget?'⚠️ Über Budget um '+(grandTotal-totalBudget).toFixed(0)+' €':'✅ Im Budget, '+(totalBudget-grandTotal).toFixed(0)+' € Reserve')+'</div>';
+  t+='</div>';
+  document.getElementById("totalEstimate").innerHTML=t;
+}
+
+// Auto-calculate fuel on input change
+document.addEventListener("DOMContentLoaded",function(){
+  setTimeout(function(){
+    var fc=document.getElementById("fuelCon");
+    var fd=document.getElementById("fuelDist");
+    if(fc)fc.addEventListener("input",calcFuel);
+    if(fd)fd.addEventListener("input",calcFuel);
+    showFuelPrices();
+  },500);
+});
+
+function calcFuel(){
+  var con=parseFloat(document.getElementById("fuelCon").value)||10.5;
+  var dist=parseFloat(document.getElementById("fuelDist").value)||0;
+  if(!dist){document.getElementById("fuelResult").innerHTML='<div style="color:var(--t2)">Strecke eingeben...</div>';return}
+  var prices=D.fuel?D.fuel.prices:{"Deutschland":1.65};
+  var liters=(dist/100)*con;
+  var h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">';
+  h+='<div class="stat-card"><div class="stat-val" style="color:var(--orange)">'+liters.toFixed(0)+' L</div><div class="stat-lbl">Verbrauch</div></div>';
+  var avgP=Object.values(prices).reduce(function(a,b){return a+b},0)/Object.values(prices).length;
+  h+='<div class="stat-card"><div class="stat-val" style="color:var(--green)">'+(liters*avgP).toFixed(0)+' €</div><div class="stat-lbl">Ø Sprit</div></div>';
+  h+='</div>';
+  Object.entries(prices).forEach(function(e){
+    h+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:.5px solid rgba(255,255,255,0.05);font-size:14px"><span>'+e[0]+'</span><span style="font-weight:700">'+(liters*e[1]).toFixed(0)+' €</span></div>';
+  });
+  document.getElementById("fuelResult").innerHTML=h;
+}
+function calcAutarkie(){
+  var ah=parseFloat(document.getElementById("batAh").value)||100;
+  var solar=parseFloat(document.getElementById("solarW").value)||400;
+  var water=parseFloat(document.getElementById("waterL").value)||30;
+  var wh=ah*12.8*0.8;
+  var battDays=wh/(150*24);
+  var solarDaily=solar*4;
+  var solarDays=solarDaily>150*24?99:wh/(150*24-solarDaily);
+  var waterDays=water/(4*2.5);
+  var h='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">';
+  var bc=battDays>2?"var(--green)":battDays>1?"var(--orange)":"var(--red)";
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+bc+'">'+battDays.toFixed(1)+'</div><div class="stat-lbl">Tage Batterie</div></div>';
+  var sc=solarDays>5?"var(--green)":"var(--orange)";
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+sc+'">'+(solarDays>10?"∞":solarDays.toFixed(1))+'</div><div class="stat-lbl">Tage Solar</div></div>';
+  var wc=waterDays>3?"var(--green)":waterDays>1.5?"var(--orange)":"var(--red)";
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+wc+'">'+waterDays.toFixed(1)+'</div><div class="stat-lbl">Tage Wasser</div></div>';
+  h+='</div>';
+  var minD=Math.min(battDays,solarDays>10?99:solarDays,waterDays);
+  var bn=minD===battDays?"Batterie":minD===waterDays?"Wasser":"Solar";
+  h+='<div style="margin-top:14px;padding:14px;background:rgba(255,159,10,0.1);border-radius:14px">';
+  h+='<div style="font-weight:700;color:var(--orange)">⚠️ Flaschenhals: '+bn+'</div>';
+  h+='<div style="font-size:13px;color:var(--t2)">Max autark: ~'+minD.toFixed(1)+' Tage</div></div>';
+  document.getElementById("autoResult").innerHTML=h;
+  // Total estimate
+  var total=D.items.reduce(function(a,b){return a+b.price},0);
+  var avgPr=D.fuel?Object.values(D.fuel.prices).reduce(function(a,b){return a+b},0)/9:1.65;
+  var fuel=(3000/100)*10.5*avgPr;
+  var vig=65;var camp=25*14;
+  var grand=total+fuel+vig+camp;
+  var t='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  t+='<div class="stat-card"><div class="stat-val">'+total.toFixed(0)+'€</div><div class="stat-lbl">Ausbau</div></div>';
+  t+='<div class="stat-card"><div class="stat-val" style="color:var(--orange)">'+fuel.toFixed(0)+'€</div><div class="stat-lbl">Sprit</div></div>';
+  t+='<div class="stat-card"><div class="stat-val">'+vig+'€</div><div class="stat-lbl">Vignetten</div></div>';
+  t+='<div class="stat-card"><div class="stat-val">'+camp+'€</div><div class="stat-lbl">Camping</div></div>';
+  t+='</div>';
+  var bgt=D.budget||5000;
+  t+='<div style="margin-top:12px;padding:16px;background:linear-gradient(135deg,rgba(10,132,255,0.15),rgba(191,90,242,0.1));border-radius:16px;text-align:center">';
+  t+='<div style="font-size:12px;color:var(--t2);text-transform:uppercase">Gesamtkosten</div>';
+  t+='<div style="font-size:36px;font-weight:800">'+grand.toFixed(0)+' €</div>';
+  t+='<div style="color:'+(grand>bgt?'var(--red)':'var(--green)')+'">'+(grand>bgt?'⚠️ Über Budget':'✅ Im Budget')+'</div></div>';
+  document.getElementById("totalEst").innerHTML=t;
+}
+document.addEventListener("input",function(e){
+  if(e.target.id==="fuelCon"||e.target.id==="fuelDist")calcFuel();
+});
+
 ld();
 </script></body></html>

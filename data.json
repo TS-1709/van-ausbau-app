@@ -1,5 +1,5 @@
 {
-  "budget": 5000,
+  "budget": 10000,
   "tripName": "Europa Roadtrip 2026",
   "family": [
     "Tobi",
@@ -919,5 +919,29 @@
       "sprache": "Niederländisch"
     }
   },
-  "notes": ""
+  "notes": "",
+  "fuel": {
+    "consumption": 10.5,
+    "type": "diesel",
+    "prices": {
+      "Deutschland": 1.65,
+      "Österreich": 1.55,
+      "Schweiz": 1.8,
+      "Italien": 1.75,
+      "Frankreich": 1.7,
+      "Slowenien": 1.55,
+      "Kroatien": 1.5,
+      "Spanien": 1.55,
+      "Niederlande": 1.9
+    }
+  },
+  "autarkie": {
+    "battery_ah": 100,
+    "battery_v": 12.8,
+    "solar_watt": 400,
+    "solar_hours": 4,
+    "water_liters": 30,
+    "water_per_day": 8,
+    "consumption_watts": 150
+  }
 }
