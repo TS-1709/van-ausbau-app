@@ -567,7 +567,7 @@ let wb='<button class="filter-chip '+(who==="all"?'on':'')+'" onclick="sw(\'all\
 fam.forEach(f=>{wb+='<button class="filter-chip '+(who===f?'on':'')+'" onclick="sw(\''+f+'\',this)">'+ic(f)+' '+es(f)+'</button>'});
 wb+='<button class="filter-chip '+(who===""?'on':'')+'" onclick="sw(\'\',this)">📋 Ohne</button>';
 document.getElementById("whoBar").innerHTML=wb;
-const tvis=D.tasks.filter(t=>who==="all"||(who===""&&!t.who:t.who===who));
+const tvis=D.tasks.filter(t=>who==="all"||(who===""?!t.who:t.who===who));
 const tdone=tvis.filter(t=>t.done).length;
 document.getElementById("tsub").textContent=tdone+"/"+tvis.length+" erledigt";
 let th="";
