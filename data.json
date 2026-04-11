@@ -1,0 +1,923 @@
+{
+  "budget": 5000,
+  "tripName": "Europa Roadtrip 2026",
+  "family": [
+    "Tobi",
+    "Pauline",
+    "Noel",
+    "Raphael"
+  ],
+  "familyIcons": {
+    "Tobi": "👨",
+    "Pauline": "👩",
+    "Noel": "🧒",
+    "Raphael": "👶"
+  },
+  "items": [
+    {
+      "id": 1,
+      "name": "Wechselrichter",
+      "price": 130,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 2,
+      "name": "2x Ladegerät",
+      "price": 100,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 3,
+      "name": "Ladebooster",
+      "price": 170,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 4,
+      "name": "Verteiler Beifahrersitz",
+      "price": 5,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 5,
+      "name": "LiFePO4 Batterie",
+      "price": 330,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 6,
+      "name": "Steckdosenleiste",
+      "price": 30,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 7,
+      "name": "CEE Steckdose",
+      "price": 30,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 8,
+      "name": "CEE Kabel",
+      "price": 70,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 9,
+      "name": "FI Zwischenstecker",
+      "price": 20,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 10,
+      "name": "Powerstation",
+      "price": 1500,
+      "cat": "⚡ Elektro",
+      "paid": false,
+      "done": false
+    },
+    {
+      "id": 11,
+      "name": "Solarpanel",
+      "price": 400,
+      "cat": "⚡ Elektro",
+      "paid": false,
+      "done": false
+    },
+    {
+      "id": 12,
+      "name": "Kabel etc.",
+      "price": 50,
+      "cat": "⚡ Elektro",
+      "paid": true,
+      "done": true
+    },
+    {
+      "id": 13,
+      "name": "Wasser auf Dach",
+      "price": 300,
+      "cat": "💧 Wasser",
+      "paid": false,
+      "done": false
+    },
+    {
+      "id": 14,
+      "name": "Kühlbox",
+      "price": 500,
+      "cat": "❄️ Kühlung",
+      "paid": false,
+      "done": false
+    },
+    {
+      "id": 15,
+      "name": "Dachzelt",
+      "price": 1600,
+      "cat": "🏕️ Dachzelt",
+      "paid": false,
+      "done": false
+    },
+    {
+      "id": 16,
+      "name": "Dachträger T5",
+      "price": 350,
+      "cat": "🏕️ Dachzelt",
+      "paid": false,
+      "done": false
+    }
+  ],
+  "nextId": 17,
+  "categories": [
+    "⚡ Elektro",
+    "💧 Wasser",
+    "❄️ Kühlung",
+    "🏕️ Dachzelt",
+    "🪑 Möbel",
+    "🔧 Reparatur",
+    "🧵 Dämmung",
+    "📦 Sonstiges"
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "text": "Dachträger + Dachzelt montieren",
+      "who": "Tobi",
+      "done": false
+    },
+    {
+      "id": 2,
+      "text": "Solarpanel auf Dachträger befestigen",
+      "who": "Tobi",
+      "done": false
+    },
+    {
+      "id": 3,
+      "text": "Wechselrichter + FI verkabeln",
+      "who": "Tobi",
+      "done": false
+    },
+    {
+      "id": 4,
+      "text": "Kühlbox Einbauplatz vorbereiten",
+      "who": "Tobi",
+      "done": false
+    },
+    {
+      "id": 5,
+      "text": "Wassertank auf Dach befestigen",
+      "who": "Tobi",
+      "done": false
+    },
+    {
+      "id": 6,
+      "text": "Dachzelt Probenacht machen",
+      "who": "",
+      "done": false
+    },
+    {
+      "id": 7,
+      "text": "Kindersitze sichern + Testfahrt",
+      "who": "Pauline",
+      "done": false
+    },
+    {
+      "id": 8,
+      "text": "Route planen + Stellplätze buchen",
+      "who": "Pauline",
+      "done": false
+    },
+    {
+      "id": 9,
+      "text": "Vignetten + Umweltstickers besorgen",
+      "who": "Pauline",
+      "done": false
+    },
+    {
+      "id": 10,
+      "text": "Reiseapotheke zusammenstellen",
+      "who": "Pauline",
+      "done": false
+    },
+    {
+      "id": 11,
+      "text": "Noel + Raphael auf Roadtrip vorbereiten",
+      "who": "Pauline",
+      "done": false
+    },
+    {
+      "id": 12,
+      "text": "Dachzelt Leiter-Höhe testen (Kinder!)",
+      "who": "Tobi",
+      "done": false
+    },
+    {
+      "id": 13,
+      "text": "Verdunkelung für Schlaf im Van",
+      "who": "",
+      "done": false
+    },
+    {
+      "id": 14,
+      "text": "Trenntoilette einbauen/platzieren",
+      "who": "Tobi",
+      "done": false
+    },
+    {
+      "id": 15,
+      "text": "Erste Test-Tour (1 Nacht) machen",
+      "who": "",
+      "done": false
+    }
+  ],
+  "nextTaskId": 16,
+  "packlist": {
+    "👶 Raphael (3J)": {
+      "members": [
+        "Raphael"
+      ],
+      "items": [
+        {
+          "text": "T-Shirts (5x)",
+          "packed": false
+        },
+        {
+          "text": "Leggings/Hosen (4x)",
+          "packed": false
+        },
+        {
+          "text": "Unterwäsche (5x)",
+          "packed": false
+        },
+        {
+          "text": "Socken (5 Paar)",
+          "packed": false
+        },
+        {
+          "text": "Fleece/Pulli (2x)",
+          "packed": false
+        },
+        {
+          "text": "Regenjacke + Gummistiefel",
+          "packed": false
+        },
+        {
+          "text": "Schlafsack (Dachzelt!)",
+          "packed": false
+        },
+        {
+          "text": "Kuscheltier / Schnuffi",
+          "packed": false
+        },
+        {
+          "text": "PJs (2x)",
+          "packed": false
+        },
+        {
+          "text": "Feste Schuhe + Sandalen",
+          "packed": false
+        },
+        {
+          "text": "Badekleidung + Schwimmflügel",
+          "packed": false
+        },
+        {
+          "text": "Sonnenhut",
+          "packed": false
+        },
+        {
+          "text": "Trinkflasche (namen)",
+          "packed": false
+        },
+        {
+          "text": "Snack-Box",
+          "packed": false
+        },
+        {
+          "text": "Schnuller Ersatz",
+          "packed": false
+        },
+        {
+          "text": "Nachtlicht (clip-on)",
+          "packed": false
+        }
+      ]
+    },
+    "🧒 Noel (5J)": {
+      "members": [
+        "Noel"
+      ],
+      "items": [
+        {
+          "text": "T-Shirts (5x)",
+          "packed": false
+        },
+        {
+          "text": "Leggings/Hosen (4x)",
+          "packed": false
+        },
+        {
+          "text": "Unterwäsche (5x)",
+          "packed": false
+        },
+        {
+          "text": "Socken (5 Paar)",
+          "packed": false
+        },
+        {
+          "text": "Fleece/Pulli (2x)",
+          "packed": false
+        },
+        {
+          "text": "Regenjacke",
+          "packed": false
+        },
+        {
+          "text": "Schlafsack (Dachzelt!)",
+          "packed": false
+        },
+        {
+          "text": "Kuscheltier / Schnuffi",
+          "packed": false
+        },
+        {
+          "text": "PJs (2x)",
+          "packed": false
+        },
+        {
+          "text": "Feste Schuhe + Sandalen",
+          "packed": false
+        },
+        {
+          "text": "Badekleidung + Schwimmflügel",
+          "packed": false
+        },
+        {
+          "text": "Sonnenhut / Cap",
+          "packed": false
+        },
+        {
+          "text": "Trinkflasche (namen)",
+          "packed": false
+        },
+        {
+          "text": "Snack-Box",
+          "packed": false
+        },
+        {
+          "text": "Wackelzahn-Besteck",
+          "packed": false
+        },
+        {
+          "text": "Wander-Rucksack (klein)",
+          "packed": false
+        }
+      ]
+    },
+    "👨 Tobi": {
+      "members": [
+        "Tobi"
+      ],
+      "items": [
+        {
+          "text": "T-Shirts (4x)",
+          "packed": false
+        },
+        {
+          "text": "Shorts/Hosen (2x)",
+          "packed": false
+        },
+        {
+          "text": "Unterwäsche (4x)",
+          "packed": false
+        },
+        {
+          "text": "Socken (4 Paar)",
+          "packed": false
+        },
+        {
+          "text": "Fleece / Hoodie",
+          "packed": false
+        },
+        {
+          "text": "Regenjacke",
+          "packed": false
+        },
+        {
+          "text": "Schlafklamotten",
+          "packed": false
+        },
+        {
+          "text": "Feste Schuhe + Sandalen",
+          "packed": false
+        },
+        {
+          "text": "Badehose",
+          "packed": false
+        },
+        {
+          "text": "Sonnenbrille + Cap",
+          "packed": false
+        },
+        {
+          "text": "Werkzeug-Set",
+          "packed": false
+        },
+        {
+          "text": "Kopflampe",
+          "packed": false
+        },
+        {
+          "text": "Reiseapotheke (Tobi)",
+          "packed": false
+        }
+      ]
+    },
+    "👩 Pauline": {
+      "members": [
+        "Pauline"
+      ],
+      "items": [
+        {
+          "text": "T-Shirts/Oberteile (4x)",
+          "packed": false
+        },
+        {
+          "text": "Hosen/Shorts (2x)",
+          "packed": false
+        },
+        {
+          "text": "Unterwäsche (4x)",
+          "packed": false
+        },
+        {
+          "text": "Socken (4 Paar)",
+          "packed": false
+        },
+        {
+          "text": "Fleece / Cardigan",
+          "packed": false
+        },
+        {
+          "text": "Regenjacke",
+          "packed": false
+        },
+        {
+          "text": "Schlafklamotten",
+          "packed": false
+        },
+        {
+          "text": "Bequeme Schuhe + Sandalen",
+          "packed": false
+        },
+        {
+          "text": "Badekleidung",
+          "packed": false
+        },
+        {
+          "text": "Sonnenbrille + Hut",
+          "packed": false
+        },
+        {
+          "text": "Kosmetik-Tasche (Mini)",
+          "packed": false
+        },
+        {
+          "text": "Reiseapotheke Kids",
+          "packed": false
+        },
+        {
+          "text": "Organizer / Packwürfel",
+          "packed": false
+        }
+      ]
+    },
+    "🏕️ Dachzelt & Schlafen": {
+      "members": [],
+      "items": [
+        {
+          "text": "Dachzelt + Heringe",
+          "packed": false
+        },
+        {
+          "text": "Dachzelt-Leiter (Höhe prüfen!)",
+          "packed": false
+        },
+        {
+          "text": "Matratze / Isomatte (Dachzelt)",
+          "packed": false
+        },
+        {
+          "text": "Schlafsäcke (4x, je nach Temp)",
+          "packed": false
+        },
+        {
+          "text": "Kissen (4x, platzsparend)",
+          "packed": false
+        },
+        {
+          "text": "Bettlaken (2x)",
+          "packed": false
+        },
+        {
+          "text": "Vorzelt / Annex (Regenschutz)",
+          "packed": false
+        },
+        {
+          "text": "Tarp / Sonnensegel",
+          "packed": false
+        },
+        {
+          "text": "Mückennetz (Dachzelt)",
+          "packed": false
+        },
+        {
+          "text": "Auffahrkeile (2 Paar)",
+          "packed": false
+        },
+        {
+          "text": "Campingtisch + Stühle (4x)",
+          "packed": false
+        },
+        {
+          "text": "Wäscheleine + Klammern",
+          "packed": false
+        }
+      ]
+    },
+    "🚐 Van & Technik": {
+      "members": [],
+      "items": [
+        {
+          "text": "Warndreieck + Warnwesten (4x!)",
+          "packed": false
+        },
+        {
+          "text": "Verbandkasten (aktuell!)",
+          "packed": false
+        },
+        {
+          "text": "Reserverad + Wagenheber",
+          "packed": false
+        },
+        {
+          "text": "Fahrzeugpapiere + Versicherung",
+          "packed": false
+        },
+        {
+          "text": "Grüne Versicherungskarte",
+          "packed": false
+        },
+        {
+          "text": "ADAC Mitgliedschaft",
+          "packed": false
+        },
+        {
+          "text": "Starterkabel",
+          "packed": false
+        },
+        {
+          "text": "Abschleppseil",
+          "packed": false
+        },
+        {
+          "text": "Ladegeräte + Kabel (4x Handy)",
+          "packed": false
+        },
+        {
+          "text": "Powerbank (groß, 20000mAh+)",
+          "packed": false
+        },
+        {
+          "text": "Verlängerungskabel 230V (25m)",
+          "packed": false
+        },
+        {
+          "text": "CEE-Adapter (Schuko→CEE)",
+          "packed": false
+        },
+        {
+          "text": "Taschenlampe + LED-Lampe",
+          "packed": false
+        },
+        {
+          "text": "Kopflampen (2x)",
+          "packed": false
+        },
+        {
+          "text": "Sonnencreme LSF50 (2x)",
+          "packed": false
+        },
+        {
+          "text": "Mückenspray (Kinder-sicher)",
+          "packed": false
+        }
+      ]
+    },
+    "🌍 Europa Roadtrip": {
+      "members": [],
+      "items": [
+        {
+          "text": "Umweltsticker Deutschland (grüner Plakette)",
+          "packed": false
+        },
+        {
+          "text": "Österreich Vignette (digital!)",
+          "packed": false
+        },
+        {
+          "text": "Schweiz Vignette (falls CH)",
+          "packed": false
+        },
+        {
+          "text": "Slowenien Vignette",
+          "packed": false
+        },
+        {
+          "text": "Italien Telepass / Maut (falls IT)",
+          "packed": false
+        },
+        {
+          "text": "Frankreich Télépéage (falls FR)",
+          "packed": false
+        },
+        {
+          "text": "Auslandskrankenversicherung",
+          "packed": false
+        },
+        {
+          "text": "Personalausweise / Reisepässe (4x!)",
+          "packed": false
+        },
+        {
+          "text": "EHIC Gesundheitskarte (alle)",
+          "packed": false
+        },
+        {
+          "text": "Kreditkarte + Bargeld (Landeswährung)",
+          "packed": false
+        },
+        {
+          "text": "Offline-Karten (Maps.me / OsmAnd)",
+          "packed": false
+        },
+        {
+          "text": "Reiseführer / Lonely Planet",
+          "packed": false
+        },
+        {
+          "text": "Sprachführer / Übersetzungs-App",
+          "packed": false
+        }
+      ]
+    },
+    "🍳 Küche & Autarkie": {
+      "members": [],
+      "items": [
+        {
+          "text": "Campingkocher + Gaskartusche (2x!)",
+          "packed": false
+        },
+        {
+          "text": "Pfanne + Topf",
+          "packed": false
+        },
+        {
+          "text": "Besteck (4x)",
+          "packed": false
+        },
+        {
+          "text": "Teller + Becher (4x, unzerbrechlich!)",
+          "packed": false
+        },
+        {
+          "text": "Schneidebrett + scharfes Messer",
+          "packed": false
+        },
+        {
+          "text": "Dosenöffner / Korkenzieher",
+          "packed": false
+        },
+        {
+          "text": "Spülmittel + Schwamm",
+          "packed": false
+        },
+        {
+          "text": "Wasserkanister 10L (2-3x!)",
+          "packed": false
+        },
+        {
+          "text": "Wasserfilter (z.B. Katadyn)",
+          "packed": false
+        },
+        {
+          "text": "Kühlbox / Eisakkus",
+          "packed": false
+        },
+        {
+          "text": "Müllbeutel + Clip",
+          "packed": false
+        },
+        {
+          "text": "Kaffee + Bialetti / Filter",
+          "packed": false
+        },
+        {
+          "text": "Grundversorgung (Salz, Öl, Gewürze)",
+          "packed": false
+        },
+        {
+          "text": "Brotboxen / Vorratsdosen",
+          "packed": false
+        },
+        {
+          "text": "Trenntoilette + Ersatzbeutel",
+          "packed": false
+        }
+      ]
+    },
+    "🎮 Kids Entertainment": {
+      "members": [],
+      "items": [
+        {
+          "text": "Tablet + Kopfhörer (2x!) + Ladegerät",
+          "packed": false
+        },
+        {
+          "text": "Malfilzstifte + Malbücher (2x)",
+          "packed": false
+        },
+        {
+          "text": "Sticker-Bücher",
+          "packed": false
+        },
+        {
+          "text": "Spiele (Uno, Memory, Dobble)",
+          "packed": false
+        },
+        {
+          "text": "Sandspielzeug",
+          "packed": false
+        },
+        {
+          "text": "Bälle / Federball",
+          "packed": false
+        },
+        {
+          "text": "Bücher / Hörspiel-Box",
+          "packed": false
+        },
+        {
+          "text": "Spielzeug (2-3 kleine pro Kind)",
+          "packed": false
+        },
+        {
+          "text": "Wasserpistolen (Sommer)",
+          "packed": false
+        },
+        {
+          "text": "Kinderrucksäcke (2x)",
+          "packed": false
+        },
+        {
+          "text": "Luftmatratze / Planschbecken",
+          "packed": false
+        }
+      ]
+    },
+    "🩺 Gesundheit & Hygiene": {
+      "members": [],
+      "items": [
+        {
+          "text": "Fieberzäpfchen Paracetamol (Kinder)",
+          "packed": false
+        },
+        {
+          "text": "Ibuprofen Kinder + Erwachsene",
+          "packed": false
+        },
+        {
+          "text": "Elotrans (Durchfall)",
+          "packed": false
+        },
+        {
+          "text": "Zeckenkarte + Pinzette",
+          "packed": false
+        },
+        {
+          "text": "Pflaster + Wundspray",
+          "packed": false
+        },
+        {
+          "text": "Sonnencreme Kids LSF50+",
+          "packed": false
+        },
+        {
+          "text": "After-Sun / Aloe Vera",
+          "packed": false
+        },
+        {
+          "text": "Zahnbürsten + Zahnpasta (4x)",
+          "packed": false
+        },
+        {
+          "text": "Duschgel / Seife (Mini)",
+          "packed": false
+        },
+        {
+          "text": "Handtücher (4x, schnell trocknend)",
+          "packed": false
+        },
+        {
+          "text": "Feuchttücher (3 Packungen!)",
+          "packed": false
+        },
+        {
+          "text": "Klopapier (3 Rollen)",
+          "packed": false
+        },
+        {
+          "text": "Solardusche (5L)",
+          "packed": false
+        },
+        {
+          "text": "Desinfektionsmittel",
+          "packed": false
+        }
+      ]
+    }
+  },
+  "countries": {
+    "🇩🇪 Deutschland": {
+      "vignette": "Keine Maut (Autobahn kostenlos)",
+      "umwelt": "Grüner Plakette nötig für Umweltzonen",
+      "notfall": "112",
+      "sprache": "Deutsch"
+    },
+    "🇦🇹 Österreich": {
+      "vignette": "Digitale Vignette: 9.90€ (10 Tage) / 29.20€ (2 Monate)",
+      "umwelt": "Keine Umweltzonen",
+      "notfall": "112 / 122",
+      "sprache": "Deutsch"
+    },
+    "🇨🇭 Schweiz": {
+      "vignette": "Autobahn-Vignette: 40 CHF (Jahres-Vignette, Pflicht!)",
+      "umwelt": "Keine Umweltzonen",
+      "notfall": "112 / 144",
+      "sprache": "Deutsch/Französisch"
+    },
+    "🇮🇹 Italien": {
+      "vignette": "Maut an Mautstationen (Telepass empfohlen)",
+      "umwelt": "ZTL-Zonen: Nicht einfahren! (Kennzeichenerkennung)",
+      "notfall": "112",
+      "sprache": "Italienisch"
+    },
+    "🇫🇷 Frankreich": {
+      "vignette": "Maut an Péage-Stationen (Télépéage für schnellere Abfertigung)",
+      "umwelt": "Crit'Air Vignetten für Städte",
+      "notfall": "112",
+      "sprache": "Französisch"
+    },
+    "🇸🇮 Slowenien": {
+      "vignette": "E-Vignette online: 15€ (7 Tage) / 30€ (1 Monat)",
+      "umwelt": "Keine Umweltzonen",
+      "notfall": "112",
+      "sprache": "Slowenisch"
+    },
+    "🇭🇷 Kroatien": {
+      "vignette": "Maut an Stationen (kreditkarte ok)",
+      "umwelt": "Keine Umweltzonen",
+      "notfall": "112",
+      "sprache": "Kroatisch"
+    },
+    "🇪🇸 Spanien": {
+      "vignette": "Maut auf einigen Autopistas (viele kostenlos!)",
+      "umwelt": "ZBE Zonen in Madrid/Barcelona",
+      "notfall": "112",
+      "sprache": "Spanisch"
+    },
+    "🇳🇱 Niederlande": {
+      "vignette": "Keine Maut",
+      "umwelt": "Umweltzonen in Amsterdam/Rotterdam etc.",
+      "notfall": "112",
+      "sprache": "Niederländisch"
+    }
+  },
+  "notes": ""
+}
