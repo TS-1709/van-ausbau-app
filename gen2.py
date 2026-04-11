@@ -1,4 +1,4 @@
-
+css = """
 :root {
   --bg: #0a0a0a;
   --c1: rgba(28,28,30,0.82);
@@ -424,3 +424,8 @@ body > * { position: relative; z-index: 1; }
 .readiness { text-align: center; padding: 16px; }
 .readiness-pct { font-size: 48px; font-weight: 800; letter-spacing: -2px; }
 .readiness-lbl { font-size: 13px; color: var(--t2); margin-top: 2px; }
+"""
+
+with open("style.css", "w") as f:
+    f.write(css)
+print(f"CSS: {len(css)} bytes")
