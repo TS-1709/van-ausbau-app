@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🚐 VW T5.2 Elektrik-System</title>
+<style>
+:root {
+  --bg: #0a0a0a; --card: rgba(28,28,30,0.92); --border: rgba(255,255,255,0.08);
+  --t: #f5f5f7; --t2: rgba(245,245,247,0.55); --blue: #0a84ff; --green: #30d158;
+  --red: #ff453a; --orange: #ff9f0a; --yellow: #ffd60a; --purple: #bf5af2; --teal: #64d2ff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--t); padding: 16px; -webkit-font-smoothing: antialiased; }
+h1 { font-size: 22px; text-align: center; margin: 8px 0 20px; }
+h2 { font-size: 17px; color: var(--t2); margin: 24px 0 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tab { padding: 8px 16px; border-radius: 20px; background: var(--card); border: 1px solid var(--border);
+  color: var(--t2); font-size: 14px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+.tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+.panel { display: none; } .panel.active { display: block; }
+
+/* Flow diagram */
+.flow { display: flex; flex-direction: column; gap: 2px; }
+.flow-row { display: flex; align-items: center; gap: 8px; }
+.flow-box { padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 600;
+  min-width: 120px; text-align: center; flex-shrink: 0; }
+.flow-arrow { color: var(--t2); font-size: 20px; text-align: center; padding: 4px 0; }
+.flow-label { font-size: 12px; color: var(--t2); margin-left: 8px; }
+.flow-note { font-size: 12px; color: var(--orange); margin-left: 8px; font-style: italic; }
+
+.source { background: rgba(10,132,255,0.15); border: 1px solid rgba(10,132,255,0.3); color: var(--blue); }
+.convert { background: rgba(191,90,242,0.15); border: 1px solid rgba(191,90,242,0.3); color: var(--purple); }
+.store { background: rgba(48,209,88,0.15); border: 1px solid rgba(48,209,88,0.3); color: var(--green); }
+.consume { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--t); }
+.safety { background: rgba(255,69,58,0.15); border: 1px solid rgba(255,69,58,0.3); color: var(--red); }
+.optional { background: rgba(255,159,10,0.15); border: 1px solid rgba(255,159,10,0.3); color: var(--orange); border-style: dashed; }
+.ac { background: rgba(255,159,10,0.15); border: 1px solid rgba(255,159,10,0.3); color: var(--orange); }
+
+/* Van layout */
+.van { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
+.van-svg { width: 100%; height: auto; }
+.van-label { font-size: 11px; fill: var(--t2); font-family: -apple-system, system-ui, sans-serif; }
+.van-component { font-size: 10px; fill: white; font-family: -apple-system, system-ui, sans-serif; font-weight: 600; }
+
+/* Spec table */
+.specs { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.specs th, .specs td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+.specs th { color: var(--t2); font-weight: 500; }
+.specs td { color: var(--t); }
+.specs .price { color: var(--green); font-weight: 600; }
+.specs .open { color: var(--orange); }
+
+/* Mode cards */
+.mode-cards { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.mode-card { background: var(--card); border-radius: 16px; padding: 16px; border: 1px solid var(--border); }
+.mode-card h3 { font-size: 16px; margin-bottom: 8px; }
+.mode-card .emoji { font-size: 24px; margin-bottom: 4px; }
+.mode-card ul { list-style: none; padding: 0; }
+.mode-card li { padding: 4px 0; font-size: 14px; color: var(--t2); }
+.mode-card li::before { content: "→ "; color: var(--blue); }
+.mode-card li.warn::before { content: "⚠ "; color: var(--orange); }
+
+/* Tips */
+.tip { background: rgba(48,209,88,0.1); border-left: 3px solid var(--green); padding: 12px 16px;
+  border-radius: 0 12px 12px 0; margin: 12px 0; font-size: 14px; }
+.warn { background: rgba(255,159,10,0.1); border-left: 3px solid var(--orange); padding: 12px 16px;
+  border-radius: 0 12px 12px 0; margin: 12px 0; font-size: 14px; }
+
+/* Responsive */
+@media (min-width: 600px) {
+  .mode-cards { grid-template-columns: 1fr 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<h1>🚐 VW T5.2 Multivan — Elektrik-System</h1>
+
+<div class="tabs">
+  <div class="tab active" onclick="showPanel('flow')">⚡ Energiefluss</div>
+  <div class="tab" onclick="showPanel('van')">📍 Einbauorte</div>
+  <div class="tab" onclick="showPanel('modes')">🔄 3 Betriebsmodi</div>
+  <div class="tab" onclick="showPanel('specs')">📋 Komponenten</div>
+  <div class="tab" onclick="showPanel('tips')">💡 Tipps</div>
+</div>
+
+<!-- ==================== PANEL 1: ENERGIEFLUSS ==================== -->
+<div id="flow" class="panel active">
+
+<h2>12V System (permanent)</h2>
+<div class="flow">
+  <div class="flow-row">
+    <div class="flow-box source">STARTER-<br>BATTERIE</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box convert">LADEBOOSTER<br><small>Victron 30A</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box safety">40A<br>SICHERUNG</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box store">LiFePO4<br>2 kWh</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box safety">TRENN-<br>SCHALTER</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box convert">12V<br>VERTEILER</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box consume">💡 USB ⚡<br>🔥 Heizung<br>❄ Kühlschrank</div>
+  </div>
+  <div class="flow-label">Während der Fahrt: Lichtmaschine → Starterbatterie → Ladebooster → LiFePO4 → Verbraucher</div>
+</div>
+
+<h2>230V System (nur bei Landstrom)</h2>
+<div class="flow">
+  <div class="flow-row">
+    <div class="flow-box ac">CEE 16A<br><small>Campingplatz</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box safety">FI 30mA</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box consume">2× SCHUKO<br>230V</div>
+    <div class="flow-arrow" style="flex-direction:column">
+      <div>↙</div><div>↘</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="flow-box ac">LADEGERÄT<br><small>230V→12V 30A</small></div>
+      <div class="flow-box ac">POWERSTATION<br><small>Schuko-Ladung</small></div>
+    </div>
+  </div>
+  <div class="flow-note">Landstrom lädt BEIDE: LiFePO4 (via Ladegerät) + Powerstation (via Schuko)</div>
+</div>
+
+<h2>Powerstation (portabel 230V)</h2>
+<div class="flow">
+  <div class="flow-row">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="flow-box ac">SCHUKO<br><small>Landstrom</small></div>
+      <div class="flow-box optional">SOLAR<br><small>faltbar 300W</small></div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box store">POWERSTATION<br><small>EcoFlow 2kWh</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box consume">☕ Wasserkocher<br>🍞 Toaster<br>💻 Laptop</div>
+  </div>
+  <div class="flow-note">Powerstation = EIGENES System. Nicht mit LiFePO4 verbunden (außer per Schuko)</div>
+</div>
+
+<h2>Solar (optional)</h2>
+<div class="flow">
+  <div class="flow-row">
+    <div class="flow-box optional">SOLAR DACH<br><small>200W Panel</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box convert">VICTRON MPPT<br><small>100/30</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box store">LiFePO4<br><small>lädt automatisch</small></div>
+  </div>
+  <div class="flow-label">+ faltbare Panels direkt an Powerstation (separat)</div>
+</div>
+
+</div>
+
+<!-- ==================== PANEL 2: EINBAUORTE ==================== -->
+<div id="van" class="panel">
+
+<svg viewBox="0 0 500 280" class="van-svg">
+  <!-- Van body outline -->
+  <path d="M30,200 L30,120 Q30,80 70,70 L350,40 Q400,35 430,50 L470,80 Q490,95 490,120 L490,200 Z" 
+    fill="none" stroke="#555" stroke-width="2"/>
+  
+  <!-- Wheels -->
+  <circle cx="100" cy="210" r="25" fill="none" stroke="#555" stroke-width="2"/>
+  <circle cx="100" cy="210" r="12" fill="#333"/>
+  <circle cx="400" cy="210" r="25" fill="none" stroke="#555" stroke-width="2"/>
+  <circle cx="400" cy="210" r="12" fill="#333"/>
+  
+  <!-- Interior zones -->
+  <rect x="50" y="85" width="80" height="100" rx="8" fill="rgba(10,132,255,0.15)" stroke="rgba(10,132,255,0.4)" stroke-width="1"/>
+  <rect x="140" y="85" width="80" height="100" rx="8" fill="rgba(191,90,242,0.15)" stroke="rgba(191,90,242,0.4)" stroke-width="1"/>
+  <rect x="280" y="70" width="80" height="110" rx="8" fill="rgba(48,209,88,0.15)" stroke="rgba(48,209,88,0.4)" stroke-width="1"/>
+  <rect x="380" y="70" width="90" height="110" rx="8" fill="rgba(191,90,242,0.15)" stroke="rgba(191,90,242,0.4)" stroke-width="1"/>
+  
+  <!-- Roof solar -->
+  <rect x="120" y="30" width="120" height="20" rx="4" fill="rgba(48,209,88,0.3)" stroke="rgba(48,209,88,0.6)" stroke-width="1"/>
+  
+  <!-- Labels -->
+  <text x="90" y="140" text-anchor="middle" class="van-component">FAHRER</text>
+  <text x="90" y="155" text-anchor="middle" class="van-label">Sitz</text>
+  
+  <text x="180" y="120" text-anchor="middle" class="van-component">LiFePO4</text>
+  <text x="180" y="135" text-anchor="middle" class="van-label">2 kWh</text>
+  <text x="180" y="150" text-anchor="middle" class="van-label">+ Booster</text>
+  <text x="180" y="165" text-anchor="middle" class="van-label">+ Trennschalter</text>
+  
+  <text x="320" y="115" text-anchor="middle" class="van-component">BEIFAHRER</text>
+  <text x="320" y="130" text-anchor="middle" class="van-label">Sitz</text>
+  <text x="320" y="150" text-anchor="middle" class="van-label">2× Schuko</text>
+  <text x="320" y="165" text-anchor="middle" class="van-label">+ Ladegerät</text>
+  
+  <text x="425" y="110" text-anchor="middle" class="van-component">POWER</text>
+  <text x="425" y="125" text-anchor="middle" class="van-component">STATION</text>
+  <text x="425" y="145" text-anchor="middle" class="van-label">Rücksitz-Bereich</text>
+  
+  <text x="180" y="45" text-anchor="middle" class="van-component">☀ SOLAR 200W</text>
+  <text x="180" y="55" text-anchor="middle" class="van-label">Dachträger</text>
+  
+  <!-- Engine bay label -->
+  <rect x="10" y="160" width="40" height="30" rx="4" fill="rgba(255,159,10,0.2)" stroke="rgba(255,159,10,0.4)" stroke-width="1"/>
+  <text x="30" y="178" text-anchor="middle" class="van-label" style="font-size:9px">MOTOR</text>
+  
+  <!-- Arrows showing cable routing -->
+  <path d="M50,175 Q40,150 50,130" stroke="rgba(10,132,255,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="4,2"/>
+  <path d="M90,130 L140,130" stroke="rgba(10,132,255,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="4,2"/>
+  <path d="M320,95 L320,80 Q320,50 180,50 L180,70" stroke="rgba(48,209,88,0.5)" stroke-width="1.5" fill="none" stroke-dasharray="4,2"/>
+  
+  <!-- Ground -->
+  <line x1="20" y1="230" x2="480" y2="230" stroke="#333" stroke-width="1"/>
+  <text x="250" y="250" text-anchor="middle" class="van-label">Wohnraum-Boden (Ansicht von oben)</text>
+</svg>
+
+<div class="tip">
+  <strong>Kabelweg:</strong> Motorraum → unter Fahrersitz (Starterbatterie) → Schwellerverkleidung Beifahrerseite → unter Beifahrersitz → weiter nach hinten zur Powerstation. Alles über die Beifahrerseite — Fahrerseite ist voll mit Werksverkabelung.
+</div>
+
+</div>
+
+<!-- ==================== PANEL 3: BETRIEBSMODI ==================== -->
+<div id="modes" class="panel">
+<div class="mode-cards">
+
+<div class="mode-card">
+  <div class="emoji">🚗</div>
+  <h3>Modus 1: Fahrt</h3>
+  <ul>
+    <li>Ladebooster lädt LiFePO4 mit 360W</li>
+    <li>12V-Verbraucher laufen von LiFePO4</li>
+    <li>Powerstation: leer, wird NICHT geladen</li>
+    <li class="warn">230V: Nicht verfügbar!</li>
+  </ul>
+  <div class="tip">2h Fahrt = ~720Wh = 60Ah in LiFePO4</div>
+</div>
+
+<div class="mode-card">
+  <div class="emoji">⛺</div>
+  <h3>Modus 2: Landstrom</h3>
+  <ul>
+    <li>Ladegerät lädt LiFePO4 mit 360W</li>
+    <li>Powerstation lädt per Schuko mit 2.300W</li>
+    <li>2× Schukodosen aktiv (230V)</li>
+    <li>ALLE Verbraucher versorgt</li>
+  </ul>
+  <div class="tip">Idealer Modus. Alles wird gleichzeitig geladen und versorgt.</div>
+</div>
+
+<div class="mode-card">
+  <div class="emoji">🏕</div>
+  <h3>Modus 3: Autark</h3>
+  <ul>
+    <li>LiFePO4 versorgt 12V (~2-3 Tage)</li>
+    <li>Powerstation versorgt 230V (~1 Tag)</li>
+    <li>Solar (optional) lädt nach</li>
+    <li class="warn">Ohne Solar: max. 2-3 Tage</li>
+  </ul>
+  <div class="warn">Mit Solar Dach + faltbar: 5-7 Tage autark möglich!</div>
+</div>
+
+</div>
+
+<h2>Autarkie-Rechner</h2>
+<table class="specs">
+<tr><th>Szenario</th><th>12V hält</th><th>230V hält</th></tr>
+<tr><td>Ohne Solar, Sommer</td><td style="color:var(--green)">~2.5 Tage</td><td style="color:var(--orange)">~1 Tag</td></tr>
+<tr><td>Ohne Solar, Winter</td><td style="color:var(--orange)">~1.4 Tage</td><td style="color:var(--red)">~0.5 Tag</td></tr>
+<tr><td>Mit Solar Dach 200W</td><td style="color:var(--green)">~5 Tage</td><td style="color:var(--orange)">~1 Tag</td></tr>
+<tr><td>Mit Solar Dach + faltbar 300W</td><td style="color:var(--green)">~5+ Tage</td><td style="color:var(--green)">~3+ Tage</td></tr>
+</table>
+</div>
+
+<!-- ==================== PANEL 4: KOMPONENTEN ==================== -->
+<div id="specs" class="panel">
+
+<h2>Bereits gekauft ✅</h2>
+<table class="specs">
+<tr><th>Komponente</th><th>Details</th><th>Preis</th></tr>
+<tr><td>LiFePO4 Batterie</td><td>12V, ~100-150Ah, mit BMS</td><td class="price">€330</td></tr>
+<tr><td>Victron Ladebooster</td><td>Orion-Tr Smart 12/12-30A (360W)</td><td class="price">€170</td></tr>
+<tr><td>Ladegerät 230V</td><td>Blue Smart 12/30 (360W)</td><td class="price">€100</td></tr>
+<tr><td>Wechselrichter</td><td>(evtl. nicht mehr nötig?)</td><td class="price">€130</td></tr>
+<tr><td>230V-Infrastruktur</td><td>CEE + 2×Schuko + FI + Kabel</td><td class="price">€155</td></tr>
+<tr><td>12V-Infrastruktur</td><td>Kabel + Sicherungen + Verteiler</td><td class="price">€85</td></tr>
+<tr><td colspan="2"><strong>Zwischensumme gekauft</strong></td><td class="price"><strong>€970</strong></td></tr>
+</table>
+
+<h2>Noch offen ❌</h2>
+<table class="specs">
+<tr><th>Komponente</th><th>Details</th><th>Preis</th></tr>
+<tr><td>Powerstation</td><td>EcoFlow Delta 2 Max (2.048Wh)</td><td class="open">€1.200-1.500</td></tr>
+<tr><td>Solar Dach (optional)</td><td>200W Panel + Victron MPPT 100/30</td><td class="open">€200-250</td></tr>
+<tr><td>Faltbare Solar (optional)</td><td>300W für Powerstation</td><td class="open">€200-300</td></tr>
+<tr><td>SmartShunt (optional)</td><td>500A Batterie-Monitor</td><td class="open">€110</td></tr>
+<tr><td>Trennschalter (empfohlen)</td><td>100A Batterie-Trennung</td><td class="open">€15</td></tr>
+<tr><td>Heizpad (für Winter)</td><td>12V Heizmatte unter Batterie</td><td class="open">€5-15</td></tr>
+<tr><td colspan="2"><strong>Gesamt (Pflicht)</strong></td><td class="open"><strong>€2.170-2.470</strong></td></tr>
+<tr><td colspan="2"><strong>Gesamt (alles)</strong></td><td class="open"><strong>€2.700-3.150</strong></td></tr>
+</table>
+
+</div>
+
+<!-- ==================== PANEL 5: TIPPS ==================== -->
+<div id="tips" class="panel">
+
+<div class="tip">
+  <strong>Kabelquerschnitt nicht sparen!</strong><br>
+  Starter→Booster: 10mm² (40A Sicherung)<br>
+  Booster→LiFePO4: 10mm² (40A Sicherung)<br>
+  LiFePO4→Verteiler: 6mm² (25A Sicherung)<br>
+  230V: 1.5mm² NYM-J
+</div>
+
+<div class="warn">
+  <strong>LiFePO4 + Kälte = ❌</strong><br>
+  Unter 0°C darf NICHT geladen werden! Das BMS schützt normalerweise, aber: Heizpad (€5) unter die Batterie kleben. ODER: LIONTRON Arctic Serie kaufen (bis -30°C).
+</div>
+
+<div class="tip">
+  <strong>Warum Victron?</strong><br>
+  Alle Victron-Geräte haben Bluetooth und funktionieren in EINER App. Du siehst: Ladezustand%, Solar-Ertrag, Ladebooster-Status, Restlaufzeit. Das ist Gold wert.
+</div>
+
+<div class="warn">
+  <strong>Der Wechselrichter (€130) — brauchst du den noch?</strong><br>
+  Mit Powerstation brauchst du KEINEN festen Wechselrichter. Die Powerstation hat alles: 230V, USB, Autossteckdose. Prüf ob du den WR zurückgeben kannst = €130 gespart.
+</div>
+
+<div class="tip">
+  <strong>Powerstation: EcoFlow Delta 2 Max</strong><br>
+  Bestes Preis-Leistungs-Verhältnis: 2.048Wh, 2.400W Dauerleistung, LiFePO4 intern, 3000+ Zyklen, App-Steuerung, erweiterbar auf 6kWh. Preis ab ~€1.200.
+</div>
+
+<div class="warn">
+  <strong>230V im Innenraum = Brandgefahr wenn schlampig!</strong><br>
+  Kabel MUSS in Kabelkanal/Schutzrohr. FI 30mA ist Pflicht. Beschriften! Wenn du dir unsicher bist: Elektriker fragen. Ernst.
+</div>
+
+<div class="tip">
+  <strong>Einbau-Reihenfolge:</strong><br>
+  1. Kabel von Motorraum verlegen (Schweller)<br>
+  2. Ladebooster unter Fahrersitz montieren<br>
+  3. LiFePO4 + Trennschalter installieren<br>
+  4. 230V-Infrastruktur unter Beifahrersitz<br>
+  5. 12V-Verteiler + Verbraucher anschließen<br>
+  6. Powerstation anschließen + testen<br>
+  7. (Optional) Solar installieren
+</div>
+
+</div>
+
+<script>
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
