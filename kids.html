@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>🎮 Roadtrip Game</title>
+<style>
+:root{--bg:#0a0a0a;--c1:rgba(28,28,30,0.92);--bdr:rgba(255,255,255,0.08);--t:#f5f5f7;--t2:rgba(245,245,247,0.55);--blue:#0a84ff;--green:#30d158;--red:#ff453a;--orange:#ff9f0a;--yellow:#ffd60a;--purple:#bf5af2;--teal:#64d2ff;--pink:#ff6482}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--t);padding:16px;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* ── Header ── */
+.header{text-align:center;padding:20px 0 16px}
+.header h1{font-size:32px;font-weight:900;letter-spacing:-1px}
+.header .sub{font-size:14px;color:var(--t2);margin-top:4px}
+
+/* ── Country Selector ── */
+.country-scroll{display:flex;gap:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:10px 0 16px;scroll-snap-type:x mandatory}
+.country-chip{flex-shrink:0;display:flex;align-items:center;gap:8px;
+  padding:10px 18px;border-radius:20px;background:rgba(255,255,255,0.06);
+  border:2px solid transparent;cursor:pointer;transition:all 0.2s;scroll-snap-align:start}
+.country-chip.active{border-color:var(--blue);background:rgba(10,132,255,0.15)}
+.country-chip .flag{font-size:24px}
+.country-chip .name{font-size:14px;font-weight:700;white-space:nowrap}
+
+/* ── Score Bar ── */
+.score-bar{display:flex;justify-content:space-between;align-items:center;
+  padding:14px 20px;margin-bottom:16px;background:var(--c1);border:1px solid var(--bdr);
+  border-radius:20px}
+.score-player{text-align:center}
+.score-avatar{font-size:28px;margin-bottom:2px}
+.score-name{font-size:11px;color:var(--t2);font-weight:600}
+.score-pts{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* ── Challenge Cards ── */
+.challenges{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.challenge{background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.06);
+  border-radius:20px;padding:20px 16px;text-align:center;cursor:pointer;
+  transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1);position:relative;overflow:hidden}
+.challenge:active{transform:scale(0.95)}
+.challenge.found{background:rgba(48,209,88,0.12);border-color:var(--green)}
+.challenge.found::after{content:'✓';position:absolute;top:8px;right:10px;font-size:16px;color:var(--green)}
+.challenge-emoji{font-size:40px;margin-bottom:8px;display:block;transition:transform 0.3s}
+.challenge.found .challenge-emoji{transform:scale(1.2) rotate(-5deg)}
+.challenge-name{font-size:14px;font-weight:700;line-height:1.3}
+.challenge-pts{font-size:12px;color:var(--orange);margin-top:6px;font-weight:700}
+.challenge.found .challenge-pts{color:var(--green)}
+.challenge-rarity{font-size:10px;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.rarity-common{color:var(--t2)}
+.rarity-rare{color:var(--blue)}
+.rarity-epic{color:var(--purple)}
+.rarity-legendary{color:var(--yellow)}
+
+/* ── Timer ── */
+.timer-section{text-align:center;margin:20px 0}
+.timer-display{font-size:64px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-2px;
+  background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text}
+.timer-controls{display:flex;gap:10px;justify-content:center;margin-top:12px}
+.timer-btn{padding:10px 24px;border-radius:16px;border:none;font-size:15px;font-weight:700;
+  cursor:pointer;transition:all 0.15s}
+.timer-btn:active{transform:scale(0.95)}
+.btn-start{background:var(--green);color:#000}
+.btn-pause{background:var(--orange);color:#000}
+.btn-reset{background:rgba(255,255,255,0.08);color:var(--t);border:1px solid var(--bdr)}
+
+/* ── Confetti ── */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden}
+.confetti-piece{position:absolute;width:10px;height:10px;border-radius:2px;animation:confettiFall 1.5s ease-out forwards}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* ── Sound feedback ── */
+.found-flash{animation:flashGreen 0.5s ease}
+@keyframes flashGreen{0%{box-shadow:0 0 0 0 rgba(48,209,88,0.6)}50%{box-shadow:0 0 40px 10px rgba(48,209,88,0.4)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
+
+/* ── Leaderboard ── */
+.leaderboard{margin-top:20px;background:var(--c1);border:1px solid var(--bdr);border-radius:20px;padding:20px}
+.lb-title{font-size:18px;font-weight:700;margin-bottom:14px;text-align:center}
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--bdr)}
+.lb-row:last-child{border:none}
+.lb-rank{font-size:20px;font-weight:800;min-width:30px;text-align:center}
+.lb-rank.gold{color:var(--yellow)}
+.lb-rank.silver{color:rgba(192,192,192,0.8)}
+.lb-rank.bronze{color:#cd7f32}
+.lb-avatar{font-size:24px}
+.lb-name{flex:1;font-size:15px;font-weight:600}
+.lb-score{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ── Back ── */
+.back-bar{margin-bottom:8px}
+.back-btn{padding:8px 14px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid var(--bdr);
+  color:var(--t);font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}
+
+/* ── Mode selector ── */
+.mode-tabs{display:flex;gap:6px;margin-bottom:16px}
+.mode-tab{flex:1;padding:10px;text-align:center;border-radius:14px;background:rgba(255,255,255,0.04);
+  border:1.5px solid var(--bdr);color:var(--t2);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.mode-tab.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+/* ── Animations ── */
+.bounce{animation:bounce 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes bounce{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+</style>
+</head>
+<body>
+
+<div class="back-bar"><a href="index.html" class="back-btn">← Zurück</a></div>
+
+<div class="header">
+  <h1>🎮 Roadtrip Game</h1>
+  <div class="sub">Wer sieht es zuerst? Tippen wenn gefunden!</div>
+</div>
+
+<!-- Country Selector -->
+<div class="country-scroll" id="countryScroll"></div>
+
+<!-- Mode Tabs -->
+<div class="mode-tabs">
+  <div class="mode-tab active" onclick="setMode('spy',this)">👀 Ich seh was</div>
+  <div class="mode-tab" onclick="setMode('speed',this)">⚡ Speed-Runde</div>
+</div>
+
+<!-- Timer (Speed mode) -->
+<div class="timer-section" id="timerSection" style="display:none">
+  <div class="timer-display" id="timerDisplay">03:00</div>
+  <div class="timer-controls">
+    <button class="timer-btn btn-start" id="timerStart" onclick="toggleTimer()">▶ Start</button>
+    <button class="timer-btn btn-reset" onclick="resetTimer()">↺ Reset</button>
+  </div>
+</div>
+
+<!-- Score Bar -->
+<div class="score-bar">
+  <div class="score-player">
+    <div class="score-avatar">👨</div>
+    <div class="score-name">Tobi</div>
+    <div class="score-pts" id="scoreTobi">0</div>
+  </div>
+  <div style="text-align:center">
+    <div style="font-size:11px;color:var(--t2);margin-bottom:4px">PUNKTE</div>
+    <div style="font-size:10px;color:var(--t2)">Tipp = +1 · Finden = Punkte</div>
+  </div>
+  <div class="score-player">
+    <div class="score-avatar">👩</div>
+    <div class="score-name">Pauline</div>
+    <div class="score-pts" id="scorePauline">0</div>
+  </div>
+</div>
+
+<!-- Challenges Grid -->
+<div class="challenges" id="challengeGrid"></div>
+
+<!-- Leaderboard -->
+<div class="leaderboard">
+  <div class="lb-title">🏆 Rangliste</div>
+  <div id="lbRows"></div>
+  <div style="text-align:center;margin-top:12px">
+    <button onclick="resetScores()" style="padding:8px 16px;border-radius:12px;background:rgba(255,69,58,0.15);
+      color:var(--red);border:1px solid rgba(255,69,58,0.3);font-size:12px;font-weight:600;cursor:pointer">
+      🔄 Scores zurücksetzen
+    </button>
+  </div>
+</div>
+
+<div class="confetti-container" id="confetti"></div>
+
+<script>
+// ── Challenge Data per Country ──
+const CHALLENGES = {
+  '🇩🇪 DE': [
+    { emoji: '🏰', name: 'Burg auf einem Berg', pts: 3, rarity: 'common' },
+    { emoji: '🌲', name: 'Waldstück an der Autobahn', pts: 1, rarity: 'common' },
+    { emoji: '💨', name: 'Windrad', pts: 2, rarity: 'common' },
+    { emoji: '🚜', name: 'Traktor auf dem Feld', pts: 2, rarity: 'common' },
+    { emoji: '🦌', name: 'Reh am Waldrand', pts: 4, rarity: 'rare' },
+    { emoji: '⛪', name: 'Dorfkirche mit Turm', pts: 2, rarity: 'common' },
+    { emoji: '🍺', name: 'Bierzelt oder Biergarten', pts: 3, rarity: 'rare' },
+    { emoji: '🏗️', name: 'Baustelle auf der Autobahn', pts: 1, rarity: 'common' },
+    { emoji: '🚃', name: 'ICE oder Zug', pts: 3, rarity: 'rare' },
+    { emoji: '🦅', name: 'Adler oder großer Vogel', pts: 5, rarity: 'epic' },
+    { emoji: '🏰', name: 'Schloss', pts: 5, rarity: 'epic' },
+    { emoji: '🌉', name: 'Große Brücke', pts: 3, rarity: 'rare' },
+  ],
+  '🇦🇹 AT': [
+    { emoji: '🏔️', name: 'Berg mit Schnee', pts: 4, rarity: 'rare' },
+    { emoji: '🐄', name: 'Kuh auf der Alm', pts: 3, rarity: 'common' },
+    { emoji: '🧀', name: 'Almhütte', pts: 3, rarity: 'common' },
+    { emoji: '💧', name: 'Wasserfall', pts: 5, rarity: 'epic' },
+    { emoji: '🏔️', name: 'Tunnel durch Berg', pts: 2, rarity: 'common' },
+    { emoji: '⛪', name: 'Kapelle am Berg', pts: 3, rarity: 'rare' },
+    { emoji: '🦅', name: 'Adler', pts: 6, rarity: 'legendary' },
+    { emoji: '🏠', name: 'Holzhütte mit Blumen', pts: 2, rarity: 'common' },
+    { emoji: '🚠', name: 'Seilbahn / Gondel', pts: 4, rarity: 'rare' },
+    { emoji: '⛷️', name: 'Skilift (auch leer)', pts: 3, rarity: 'rare' },
+    { emoji: '🏞️', name: 'Grüner See', pts: 4, rarity: 'rare' },
+    { emoji: '🎵', name: 'Schild "Musik"', pts: 5, rarity: 'epic' },
+  ],
+  '🇮🇹 IT': [
+    { emoji: '🛵', name: 'Vespa oder Moped', pts: 2, rarity: 'common' },
+    { emoji: '🍕', name: 'Pizzeria-Schild', pts: 2, rarity: 'common' },
+    { emoji: '🏛️', name: 'Säulenruine oder altes Gebäude', pts: 4, rarity: 'rare' },
+    { emoji: '🍇', name: 'Weinberg', pts: 3, rarity: 'common' },
+    { emoji: '🍋', name: 'Zitronenbaum', pts: 4, rarity: 'rare' },
+    { emoji: '🌊', name: 'Meer / Küste', pts: 3, rarity: 'rare' },
+    { emoji: '⛪', name: 'Kuppel-Kirche', pts: 3, rarity: 'rare' },
+    { emoji: '🏰', name: 'Mittelalterliche Stadtmauer', pts: 4, rarity: 'rare' },
+    { emoji: '☀️', name: 'Wäscheleine mit Wäsche', pts: 2, rarity: 'common' },
+    { emoji: '🛥️', name: 'Boot im Hafen', pts: 4, rarity: 'rare' },
+    { emoji: '🍝', name: 'Osteria / Trattoria', pts: 2, rarity: 'common' },
+    { emoji: '⛲', name: 'Brunnen auf dem Platz', pts: 3, rarity: 'common' },
+  ],
+  '🇨🇭 CH': [
+    { emoji: '🏔️', name: 'Matterhorn-Form', pts: 8, rarity: 'legendary' },
+    { emoji: '🧀', name: 'Käserei-Schild', pts: 3, rarity: 'common' },
+    { emoji: '🚂', name: 'Rotter Bergzug', pts: 4, rarity: 'rare' },
+    { emoji: '🐄', name: 'Kuh mit Glocke', pts: 3, rarity: 'common' },
+    { emoji: '🏔️', name: 'Gletscher', pts: 6, rarity: 'epic' },
+    { emoji: '💧', name: 'Kristallklarer See', pts: 4, rarity: 'rare' },
+    { emoji: '🏦', name: 'Bank-Gebäude', pts: 2, rarity: 'common' },
+    { emoji: '🍫', name: 'Schokoladen-Schild', pts: 3, rarity: 'rare' },
+    { emoji: '⛺', name: 'Campingplatz', pts: 2, rarity: 'common' },
+    { emoji: '🏘️', name: 'Holzdorf mit Kirche', pts: 3, rarity: 'common' },
+    { emoji: '🌉', name: 'Brücke über Schlucht', pts: 4, rarity: 'rare' },
+    { emoji: '🦌', name: 'Gems auf Felsen', pts: 7, rarity: 'legendary' },
+  ],
+  '🇫🇷 FR': [
+    { emoji: '🏰', name: 'Schloss (Château)', pts: 4, rarity: 'rare' },
+    { emoji: '🌻', name: 'Sonnenblumenfeld', pts: 3, rarity: 'common' },
+    { emoji: '🍇', name: 'Weinreben an Straße', pts: 3, rarity: 'common' },
+    { emoji: '🥖', name: 'Bäckerei / Boulangerie', pts: 2, rarity: 'common' },
+    { emoji: '🗼', name: 'Eiffelturm-Silhouette', pts: 10, rarity: 'legendary' },
+    { emoji: ' Lavendel', name: 'Lavendelfeld', pts: 5, rarity: 'epic' },
+    { emoji: '⛪', name: 'Kathedrale', pts: 4, rarity: 'rare' },
+    { emoji: '🧀', name: 'Fromagerie', pts: 3, rarity: 'rare' },
+    { emoji: '⚓', name: 'Hafen mit Fischerbooten', pts: 3, rarity: 'rare' },
+    { emoji: '🏰', name: 'Burg auf Klippe', pts: 5, rarity: 'epic' },
+    { emoji: '🚁', name: 'TGV oder Hochgeschwindigkeitszug', pts: 4, rarity: 'rare' },
+    { emoji: '🥐', name: 'Croissant-Werbung', pts: 2, rarity: 'common' },
+  ],
+  '🇭🇷 HR': [
+    { emoji: '🌊', name: 'Adriatische Küste', pts: 3, rarity: 'common' },
+    { emoji: '⛵', name: 'Segelboot', pts: 3, rarity: 'common' },
+    { emoji: '🏰', name: 'Dubrovnik-ähnliche Stadtmauer', pts: 5, rarity: 'epic' },
+    { emoji: '🫒', name: 'Olivenbaum', pts: 2, rarity: 'common' },
+    { emoji: '🐟', name: 'Fischmarkt', pts: 3, rarity: 'rare' },
+    { emoji: '🏛️', name: 'Römische Säule', pts: 4, rarity: 'rare' },
+    { emoji: '🏝️', name: 'Insel im Meer', pts: 4, rarity: 'rare' },
+    { emoji: '🦀', name: 'Krebs oder Seestern', pts: 5, rarity: 'epic' },
+    { emoji: '🏕️', name: 'Camping direkt am Meer', pts: 2, rarity: 'common' },
+    { emoji: '🚤', name: 'Speedboot', pts: 3, rarity: 'rare' },
+    { emoji: '🏔️', name: 'Berge direkt neben Meer', pts: 5, rarity: 'epic' },
+    { emoji: '🍷', name: 'Wein-Schild (Plavac)', pts: 3, rarity: 'rare' },
+  ],
+  '🇪🇸 ES': [
+    { emoji: '🐂', name: 'Bulle (Werbetafel reicht)', pts: 3, rarity: 'common' },
+    { emoji: '🏖️', name: 'Strand', pts: 2, rarity: 'common' },
+    { emoji: '🏰', name: 'Alcázar oder Burg', pts: 4, rarity: 'rare' },
+    { emoji: '🌴', name: 'Palmenreihe', pts: 3, rarity: 'common' },
+    { emoji: '🍷', name: 'Weingut / Bodega', pts: 3, rarity: 'rare' },
+    { emoji: '💃', name: 'Flamenco-Schild', pts: 4, rarity: 'rare' },
+    { emoji: '🏗️', name: 'Sagrada Familia-ähnlich', pts: 6, rarity: 'epic' },
+    { emoji: '☀️', name: 'Siesta-Schild (mittags geschlossen)', pts: 3, rarity: 'common' },
+    { emoji: '🛕', name: 'Moschee oder Minarett', pts: 4, rarity: 'rare' },
+    { emoji: '🧀', name: 'Jamón-Schinken im Schaufenster', pts: 3, rarity: 'rare' },
+    { emoji: '⛲', name: 'Plaza mit Brunnen', pts: 2, rarity: 'common' },
+    { emoji: '🦎', name: 'Eidechse auf Felsen', pts: 5, rarity: 'epic' },
+  ],
+  '🇳🇱 NL': [
+    { emoji: '🚲', name: 'Haufen Fahrräder', pts: 2, rarity: 'common' },
+    { emoji: '🌷', name: 'Tulpenfeld', pts: 3, rarity: 'common' },
+    { emoji: '💨', name: 'Windmühle', pts: 3, rarity: 'common' },
+    { emoji: '🧀', name: 'Käsemarkt oder -laden', pts: 3, rarity: 'rare' },
+    { emoji: '🐄', name: 'Kuh auf flachem Weide', pts: 2, rarity: 'common' },
+    { emoji: '🌊', name: 'Deich', pts: 3, rarity: 'common' },
+    { emoji: '🏠', name: 'Schiefes Haus', pts: 4, rarity: 'rare' },
+    { emoji: '🛶', name: 'Kanal mit Boot', pts: 3, rarity: 'common' },
+    { emoji: '🌼', name: 'Blumenmarkt', pts: 4, rarity: 'rare' },
+    { emoji: '⛅', name: 'Riesiger Himmel (flaches Land)', pts: 2, rarity: 'common' },
+    { emoji: '🏗️', name: 'Hafenkran', pts: 3, rarity: 'rare' },
+    { emoji: '🐩', name: 'Hund auf dem Deich', pts: 2, rarity: 'common' },
+  ],
+};
+
+// ── State ──
+let scores = JSON.parse(localStorage.getItem('roadgame_scores') || '{"Tobi":0,"Pauline":0,"Noel":0,"Raphael":0}');
+let found = JSON.parse(localStorage.getItem('roadgame_found') || '{}');
+let currentCountry = Object.keys(CHALLENGES)[0];
+let currentMode = 'spy';
+let timerInterval = null;
+let timerSeconds = 180;
+let timerRunning = false;
+
+// ── Audio Context for sounds ──
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function playSound(type) {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  if (type === 'find') {
+    osc.frequency.setValueAtTime(523, audioCtx.currentTime); // C5
+    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1); // E5
+    osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2); // G5
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.4);
+  } else if (type === 'rare') {
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(554, audioCtx.currentTime + 0.1);
+    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.2);
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.5);
+  } else if (type === 'legendary') {
+    [523,659,784,1047].forEach((freq, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.frequency.setValueAtTime(freq, audioCtx.currentTime + i * 0.12);
+      g.gain.setValueAtTime(0.25, audioCtx.currentTime + i * 0.12);
+      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.12 + 0.3);
+      o.start(audioCtx.currentTime + i * 0.12);
+      o.stop(audioCtx.currentTime + i * 0.12 + 0.3);
+    });
+    osc.disconnect();
+    return;
+  } else {
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.15);
+  }
+}
+
+// ── Confetti ──
+function fireConfetti() {
+  const container = document.getElementById('confetti');
+  const colors = ['#0a84ff','#30d158','#ff9f0a','#ffd60a','#bf5af2','#ff6482','#64d2ff'];
+  for (let i = 0; i < 30; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 0.5 + 's';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 2000);
+  }
+}
+
+// ── Render ──
+function renderCountries() {
+  const scroll = document.getElementById('countryScroll');
+  scroll.innerHTML = Object.keys(CHALLENGES).map(c => {
+    const [flag, code] = c.split(' ');
+    const foundCount = (found[c] || []).length;
+    const total = CHALLENGES[c].length;
+    return `<div class="country-chip ${c === currentCountry ? 'active' : ''}" onclick="selectCountry('${c}')">
+      <span class="flag">${flag}</span>
+      <span class="name">${code} <span style="font-size:11px;color:var(--t2)">${foundCount}/${total}</span></span>
+    </div>`;
+  }).join('');
+}
+
+function renderChallenges() {
+  const grid = document.getElementById('challengeGrid');
+  const challenges = CHALLENGES[currentCountry] || [];
+  const countryFound = found[currentCountry] || [];
+  
+  grid.innerHTML = challenges.map((ch, i) => {
+    const isFound = countryFound.includes(i);
+    const rarityClass = 'rarity-' + ch.rarity;
+    const rarityLabel = { common: 'Häufig', rare: 'Selten', epic: 'Episch', legendary: 'Legendär' }[ch.rarity];
+    
+    return `<div class="challenge ${isFound ? 'found' : ''}" onclick="toggleFound(${i})" id="ch-${i}">
+      <span class="challenge-emoji">${ch.emoji}</span>
+      <div class="challenge-name">${ch.name}</div>
+      <div class="challenge-pts">${isFound ? '✓ Gefunden!' : '+' + ch.pts + ' Punkte'}</div>
+      <div class="challenge-rarity ${rarityClass}">${rarityLabel}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderScores() {
+  document.getElementById('scoreTobi').textContent = scores.Tobi || 0;
+  document.getElementById('scorePauline').textContent = scores.Pauline || 0;
+  
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const medals = ['gold', 'silver', 'bronze'];
+  const icons = { 'Tobi': '👨', 'Pauline': '👩', 'Noel': '🧒', 'Raphael': '👶' };
+  
+  document.getElementById('lbRows').innerHTML = sorted.map(([name, pts], i) => `
+    <div class="lb-row">
+      <div class="lb-rank ${medals[i] || ''}">${i < 3 ? ['🥇','🥈','🥉'][i] : i + 1}</div>
+      <div class="lb-avatar">${icons[name] || '👤'}</div>
+      <div class="lb-name">${name}</div>
+      <div class="lb-score">${pts}</div>
+    </div>
+  `).join('');
+}
+
+// ── Actions ──
+function selectCountry(c) {
+  currentCountry = c;
+  renderCountries();
+  renderChallenges();
+}
+
+function toggleFound(idx) {
+  const key = currentCountry;
+  if (!found[key]) found[key] = [];
+  
+  const challenge = CHALLENGES[key][idx];
+  const pos = found[key].indexOf(idx);
+  
+  if (pos >= 0) {
+    // Unfind
+    found[key].splice(pos, 1);
+    scores.Tobi = Math.max(0, (scores.Tobi || 0) - challenge.pts);
+    playSound('click');
+  } else {
+    // Found!
+    found[key].push(idx);
+    
+    // Ask who found it
+    const who = prompt(`Wer hat "${challenge.name}" entdeckt? (T / P / N / R)`, 'T');
+    const player = who?.toUpperCase().startsWith('P') ? 'Pauline' 
+      : who?.toUpperCase().startsWith('N') ? 'Noel'
+      : who?.toUpperCase().startsWith('R') ? 'Raphael' : 'Tobi';
+    
+    scores[player] = (scores[player] || 0) + challenge.pts;
+    
+    // Sound + confetti based on rarity
+    if (challenge.rarity === 'legendary') {
+      playSound('legendary');
+      fireConfetti();
+      fireConfetti();
+    } else if (challenge.rarity === 'epic') {
+      playSound('rare');
+      fireConfetti();
+    } else {
+      playSound('find');
+    }
+    
+    // Visual feedback
+    const el = document.getElementById('ch-' + idx);
+    if (el) { el.classList.add('bounce'); setTimeout(() => el.classList.remove('bounce'), 500); }
+  }
+  
+  saveState();
+  renderChallenges();
+  renderScores();
+  renderCountries();
+}
+
+function setMode(mode, el) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('timerSection').style.display = mode === 'speed' ? 'block' : 'none';
+}
+
+// ── Timer ──
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerStart').textContent = '▶ Weiter';
+    document.getElementById('timerStart').className = 'timer-btn btn-start';
+  } else {
+    timerRunning = true;
+    document.getElementById('timerStart').textContent = '⏸ Pause';
+    document.getElementById('timerStart').className = 'timer-btn btn-pause';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerSeconds = 0;
+        playSound('legendary');
+        fireConfetti();
+        document.getElementById('timerStart').textContent = '⏰ Zeit!';
+        document.getElementById('timerStart').className = 'timer-btn btn-start';
+      }
+      renderTimer();
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 180;
+  document.getElementById('timerStart').textContent = '▶ Start';
+  document.getElementById('timerStart').className = 'timer-btn btn-start';
+  renderTimer();
+}
+
+function renderTimer() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+// ── State ──
+function saveState() {
+  localStorage.setItem('roadgame_scores', JSON.stringify(scores));
+  localStorage.setItem('roadgame_found', JSON.stringify(found));
+}
+
+function resetScores() {
+  if (!confirm('Alle Scores zurücksetzen?')) return;
+  scores = { Tobi: 0, Pauline: 0, Noel: 0, Raphael: 0 };
+  found = {};
+  saveState();
+  renderScores();
+  renderChallenges();
+  renderCountries();
+}
+
+// ── Init ──
+renderCountries();
+renderChallenges();
+renderScores();
+renderTimer();
+</script>
+</body>
+</html>

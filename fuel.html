@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>⛽ Tanken</title>
+<style>
+:root{--bg:#0a0a0a;--c1:rgba(28,28,30,0.92);--c2:rgba(44,44,46,0.6);--bdr:rgba(255,255,255,0.08);--t:#f5f5f7;--t2:rgba(245,245,247,0.55);--blue:#0a84ff;--green:#30d158;--red:#ff453a;--orange:#ff9f0a;--yellow:#ffd60a;--purple:#bf5af2;--teal:#64d2ff}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--t);padding:16px;padding-bottom:80px;min-height:100vh;-webkit-font-smoothing:antialiased}
+h1{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.sub{font-size:13px;color:var(--t2);margin-bottom:20px}
+.glass{background:var(--c1);border:1px solid var(--bdr);border-radius:20px;padding:20px;margin-bottom:12px}
+.section-title{font-size:20px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.pill{display:inline-block;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:700}
+.pill-open{background:rgba(48,209,88,0.15);color:var(--green)}
+.pill-closed{background:rgba(255,69,58,0.15);color:var(--red)}
+
+/* Fuel type selector */
+.fuel-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.fuel-tab{padding:8px 18px;border-radius:20px;background:rgba(255,255,255,0.06);border:1.5px solid var(--bdr);
+  color:var(--t2);font-size:14px;font-weight:600;white-space:nowrap;cursor:pointer;transition:all 0.2s}
+.fuel-tab.active{background:var(--orange);color:#000;border-color:var(--orange)}
+
+/* Station card */
+.station{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:16px;
+  padding:16px;margin-bottom:8px;display:flex;align-items:center;gap:14px;transition:all 0.15s}
+.station:active{transform:scale(0.98);background:rgba(255,255,255,0.06)}
+.station-price{font-size:28px;font-weight:800;letter-spacing:-1px;min-width:80px;text-align:center;
+  font-variant-numeric:tabular-nums}
+.station-price.cheapest{color:var(--green);text-shadow:0 0 20px rgba(48,209,88,0.3)}
+.station-price.mid{color:var(--yellow)}
+.station-price.expensive{color:var(--red)}
+.station-info{flex:1;min-width:0}
+.station-name{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.station-addr{font-size:12px;color:var(--t2);margin-top:3px}
+.station-meta{display:flex;gap:8px;margin-top:6px;align-items:center}
+.station-dist{font-size:12px;font-weight:600;color:var(--teal)}
+.station-brand{font-size:11px;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,0.06);color:var(--t2)}
+.station-nav{width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;cursor:pointer;font-size:18px;text-decoration:none;color:#000;
+  transition:transform 0.15s}
+.station-nav:active{transform:scale(0.9)}
+
+/* Stats bar */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.stat{text-align:center;padding:12px 8px;background:rgba(255,255,255,0.04);border-radius:14px;border:1px solid rgba(255,255,255,0.04)}
+.stat-val{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-lbl{font-size:10px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:0.5px}
+
+/* Country prices */
+.country-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.country-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:12px}
+.country-flag{font-size:24px;margin-bottom:4px}
+.country-name{font-size:13px;font-weight:600;margin-bottom:4px}
+.country-price{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.country-diff{font-size:11px;margin-top:2px}
+.diff-cheap{color:var(--green)}
+.diff-exp{color:var(--red)}
+
+/* Location */
+.loc-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;
+  background:rgba(10,132,255,0.1);border:1px solid rgba(10,132,255,0.2);border-radius:14px}
+.loc-icon{font-size:20px}
+.loc-text{flex:1;font-size:14px;font-weight:500}
+.loc-btn{padding:6px 14px;border-radius:12px;background:var(--blue);color:#000;border:none;font-size:13px;
+  font-weight:700;cursor:pointer}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--t2)}
+.loading-spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--bdr);
+  border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Empty */
+.empty{text-align:center;padding:40px;color:var(--t2)}
+.empty-emoji{font-size:48px;margin-bottom:8px}
+
+/* Back button */
+.back-bar{display:flex;align-items:center;margin-bottom:16px}
+.back-btn{padding:8px 14px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid var(--bdr);
+  color:var(--t);font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}
+
+/* Radius selector */
+.rad-pills{display:flex;gap:6px;margin-bottom:16px}
+.rad-pill{padding:6px 14px;border-radius:16px;background:rgba(255,255,255,0.06);border:1.5px solid var(--bdr);
+  color:var(--t2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.rad-pill.active{background:var(--teal);color:#000;border-color:var(--teal)}
+
+/* Savings highlight */
+.savings{background:linear-gradient(135deg,rgba(48,209,88,0.15),rgba(10,132,255,0.1));border:1px solid rgba(48,209,88,0.3);
+  border-radius:16px;padding:16px;margin:16px 0;text-align:center}
+.savings-amount{font-size:36px;font-weight:800;color:var(--green);letter-spacing:-1px}
+.savings-label{font-size:12px;color:var(--t2);margin-top:4px}
+</style>
+</head>
+<body>
+
+<div class="back-bar">
+  <a href="index.html" class="back-btn">← Zurück</a>
+</div>
+
+<h1>⛽ Tankstellen</h1>
+<div class="sub" id="locLabel">Standort wird ermittelt...</div>
+
+<div class="loc-bar" id="locBar" style="display:none">
+  <span class="loc-icon">📍</span>
+  <span class="loc-text" id="locText"></span>
+  <button class="loc-btn" onclick="getLocation()">🔄</button>
+</div>
+
+<div class="fuel-tabs" id="fuelTabs">
+  <div class="fuel-tab active" onclick="setFuel('diesel',this)">⛽ Diesel</div>
+  <div class="fuel-tab" onclick="setFuel('e5',this)">🟢 Super E5</div>
+  <div class="fuel-tab" onclick="setFuel('e10',this)">🟡 Super E10</div>
+</div>
+
+<div class="rad-pills" id="radPills">
+  <div class="rad-pill active" onclick="setRad(5,this)">5 km</div>
+  <div class="rad-pill" onclick="setRad(10,this)">10 km</div>
+  <div class="rad-pill" onclick="setRad(15,this)">15 km</div>
+  <div class="rad-pill" onclick="setRad(25,this)">25 km</div>
+</div>
+
+<div id="stationList">
+  <div class="loading"><div class="loading-spinner"></div><br>Suche Tankstellen...</div>
+</div>
+
+<div class="glass" id="savingsCard" style="display:none">
+  <div class="savings">
+    <div class="savings-amount" id="savingsAmt">—</div>
+    <div class="savings-label">Ersparnis günstigste vs. teuerste Tankstelle im Umkreis</div>
+  </div>
+</div>
+
+<div class="glass" id="intlSection" style="display:none">
+  <div class="section-title">🌍 Spritpreise Europa</div>
+  <div class="sub" style="margin-bottom:12px">Durchschnittspreise pro Land (€/Liter Diesel) · Quelle: OpenVan.camp</div>
+  <div class="country-grid" id="countryGrid"></div>
+</div>
+
+<script>
+// CONFIG — Replace with your Tankerkönig API key
+// Register free: https://creativecommons.tankerkoenig.de
+const TK_KEY = localStorage.getItem('tk_api_key') || '00000000-0000-0000-0000-000000000002';
+const TK_BASE = 'https://creativecommons.tankerkoenig.de/json';
+const OPENVAN_URL = 'https://openvan.camp/api/fuel/prices';
+
+let lat = null, lng = null, fuelType = 'diesel', radius = 5;
+let stations = [], intlPrices = null;
+
+// European countries for the roadtrip
+const EU_COUNTRIES = ['DE','AT','CH','IT','FR','ES','NL','BE','CZ','PL','HU','HR','SI','SK','DK','SE','NO','PT','GR','GB'];
+
+// ── Location ──
+function getLocation() {
+  document.getElementById('stationList').innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>GPS-Position wird ermittelt...</div>';
+  
+  if (!navigator.geolocation) {
+    fallbackLocation();
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      lat = pos.coords.latitude;
+      lng = pos.coords.longitude;
+      document.getElementById('locBar').style.display = 'flex';
+      document.getElementById('locText').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      document.getElementById('locLabel').textContent = `Position: ${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`;
+      loadStations();
+      loadIntlPrices();
+    },
+    err => {
+      console.warn('GPS failed:', err);
+      fallbackLocation();
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function fallbackLocation() {
+  // Use Weiden i.d.OPf. as default (user's location)
+  lat = 49.6764; lng = 12.1536;
+  document.getElementById('locBar').style.display = 'flex';
+  document.getElementById('locText').textContent = 'Weiden i.d.OPf. (Standard)';
+  document.getElementById('locLabel').textContent = 'Standard-Standort — GPS für genaue Position aktivieren';
+  loadStations();
+  loadIntlPrices();
+}
+
+// ── Fuel Type ──
+function setFuel(type, el) {
+  fuelType = type;
+  document.querySelectorAll('.fuel-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  loadStations();
+}
+
+// ── Radius ──
+function setRad(r, el) {
+  radius = r;
+  document.querySelectorAll('.rad-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  loadStations();
+}
+
+// ── Load Stations (Tankerkönig) ──
+async function loadStations() {
+  if (!lat) return;
+  
+  document.getElementById('stationList').innerHTML = '<div class="loading"><div class="loading-spinner"></div><br>Suche Tankstellen...</div>';
+  
+  try {
+    const url = `${TK_BASE}/list.php?lat=${lat}&lng=${lng}&rad=${radius}&type=${fuelType}&sort=price&apikey=${TK_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if (!data.ok || !data.stations) {
+      throw new Error(data.message || 'API Fehler');
+    }
+    
+    stations = data.stations;
+    renderStations();
+    cacheData('stations', data);
+    
+  } catch (e) {
+    console.warn('Tankerkönig API failed:', e);
+    const cached = getCachedData('stations');
+    if (cached) {
+      stations = cached.stations;
+      renderStations(true);
+    } else {
+      document.getElementById('stationList').innerHTML = `
+        <div class="empty">
+          <div class="empty-emoji">📡</div>
+          <div>Keine Verbindung zur Tankerkönig-API</div>
+          <div style="font-size:12px;margin-top:8px;color:var(--t2)">
+            ${TK_KEY.startsWith('00000000') ? '⚠️ Demo-Key — eigenen Key eintragen für echte Preise' : e.message}
+          </div>
+        </div>`;
+    }
+  }
+}
+
+function renderStations(cached = false) {
+  if (!stations.length) {
+    document.getElementById('stationList').innerHTML = `
+      <div class="empty">
+        <div class="empty-emoji">⛽</div>
+        <div>Keine Tankstellen im ${radius}km Umkreis gefunden</div>
+      </div>`;
+    document.getElementById('savingsCard').style.display = 'none';
+    return;
+  }
+  
+  const priceKey = fuelType;
+  const prices = stations.filter(s => s[priceKey] != null).map(s => s[priceKey]);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  
+  let html = cached ? '<div style="font-size:11px;color:var(--orange);margin-bottom:8px">⚠️ Zwischengespeichert — offline</div>' : '';
+  
+  stations.forEach((s, i) => {
+    const p = s[priceKey];
+    if (p == null) return;
+    
+    const pClass = p <= minPrice + 0.02 ? 'cheapest' : p >= maxPrice - 0.02 ? 'expensive' : 'mid';
+    const priceStr = p.toFixed(3).replace('.', ',');
+    const brand = s.brand || 'Unbekannt';
+    const addr = `${s.street || ''} ${s.houseNumber || ''}, ${s.postCode || ''} ${s.place || ''}`.trim();
+    const openBadge = s.isOpen 
+      ? '<span class="pill pill-open">Geöffnet</span>' 
+      : '<span class="pill pill-closed">Geschlossen</span>';
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`;
+    
+    html += `
+      <div class="station" style="animation:fadeIn 0.3s ease ${i * 0.05}s both">
+        <div class="station-price ${pClass}">${priceStr}€</div>
+        <div class="station-info">
+          <div class="station-name">${escHtml(s.name || brand)}</div>
+          <div class="station-addr">${escHtml(addr)}</div>
+          <div class="station-meta">
+            <span class="station-dist">📏 ${s.dist} km</span>
+            <span class="station-brand">${escHtml(brand)}</span>
+            ${openBadge}
+          </div>
+        </div>
+        <a href="${mapsUrl}" target="_blank" rel="noopener" class="station-nav">🧭</a>
+      </div>`;
+  });
+  
+  document.getElementById('stationList').innerHTML = html;
+  
+  // Savings
+  if (prices.length >= 2) {
+    // Calculate savings for 60L tank
+    const tankL = 60;
+    const saved = (maxPrice - minPrice) * tankL;
+    document.getElementById('savingsAmt').textContent = saved.toFixed(2) + '€';
+    document.getElementById('savingsCard').style.display = 'block';
+  }
+}
+
+// ── International Prices (OpenVan.camp) ──
+async function loadIntlPrices() {
+  try {
+    const res = await fetch(OPENVAN_URL);
+    const data = await res.json();
+    if (!data.success) throw new Error('API failed');
+    
+    intlPrices = data.data;
+    renderIntlPrices();
+    cacheData('intl', data);
+    
+  } catch (e) {
+    console.warn('OpenVan.camp failed:', e);
+    const cached = getCachedData('intl');
+    if (cached) {
+      intlPrices = cached.data;
+      renderIntlPrices();
+    }
+  }
+}
+
+function renderIntlPrices() {
+  if (!intlPrices) return;
+  
+  const dePrice = intlPrices.DE?.prices?.diesel;
+  if (!dePrice) return;
+  
+  let cards = '';
+  EU_COUNTRIES.forEach(code => {
+    const c = intlPrices[code];
+    if (!c?.prices?.diesel) return;
+    
+    const dp = c.prices.diesel;
+    const diff = dp - dePrice;
+    const diffPct = ((diff / dePrice) * 100).toFixed(0);
+    const diffClass = diff <= 0 ? 'diff-cheap' : 'diff-exp';
+    const diffSign = diff >= 0 ? '+' : '';
+    const flag = countryFlag(code);
+    const currency = c.currency === 'EUR' ? '€' : c.currency;
+    const priceStr = c.currency === 'EUR' ? dp.toFixed(3).replace('.', ',') : dp.toFixed(2);
+    const unit = c.currency === 'EUR' ? '€/L' : `${currency}/L`;
+    
+    cards += `
+      <div class="country-card">
+        <div class="country-flag">${flag}</div>
+        <div class="country-name">${c.country_name}</div>
+        <div class="country-price">${priceStr} ${unit}</div>
+        <div class="country-diff ${diffClass}">${diffSign}${diffPct}% vs DE</div>
+      </div>`;
+  });
+  
+  document.getElementById('countryGrid').innerHTML = cards;
+  document.getElementById('intlSection').style.display = 'block';
+}
+
+// ── Helpers ──
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function countryFlag(code) {
+  return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
+function cacheData(key, data) {
+  try { localStorage.setItem('fuel_' + key, JSON.stringify({ t: Date.now(), d: data })); } catch(e) {}
+}
+
+function getCachedData(key) {
+  try {
+    const raw = localStorage.getItem('fuel_' + key);
+    if (!raw) return null;
+    const { t, d } = JSON.parse(raw);
+    // Cache valid for 1 hour
+    if (Date.now() - t > 3600000) return null;
+    return d;
+  } catch(e) { return null; }
+}
+
+// ── Init ──
+getLocation();
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>🧭 Co-Pilot</title>
+<style>
+:root{--bg:#0a0a0a;--c1:rgba(28,28,30,0.92);--bdr:rgba(255,255,255,0.08);--t:#f5f5f7;--t2:rgba(245,245,247,0.55);--blue:#0a84ff;--green:#30d158;--red:#ff453a;--orange:#ff9f0a;--yellow:#ffd60a;--purple:#bf5af2;--teal:#64d2ff}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--t);padding:16px;min-height:100vh;-webkit-font-smoothing:antialiased}
+.header{text-align:center;padding:10px 0 20px}
+.header h1{font-size:28px;font-weight:800}
+.speed-display{text-align:center;margin:10px 0 20px}
+.speed-num{font-size:96px;font-weight:900;letter-spacing:-4px;font-variant-numeric:tabular-nums;
+  background:linear-gradient(135deg,var(--green),var(--teal));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text}
+.speed-unit{font-size:20px;color:var(--t2);font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.card{background:var(--c1);border:1px solid var(--bdr);border-radius:20px;padding:16px;text-align:center}
+.card-icon{font-size:28px;margin-bottom:6px}
+.card-val{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums}
+.card-lbl{font-size:11px;color:var(--t2);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+.nearby{background:var(--c1);border:1px solid var(--bdr);border-radius:20px;padding:16px;margin-bottom:12px}
+.nearby-title{font-size:18px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.nearby-item{display:flex;align-items:center;gap:12px;padding:10px;background:rgba(255,255,255,0.03);
+  border-radius:12px;margin-bottom:6px}
+.nearby-icon{font-size:24px;width:36px;text-align:center}
+.nearby-info{flex:1}
+.nearby-name{font-size:14px;font-weight:600}
+.nearby-detail{font-size:12px;color:var(--t2);margin-top:2px}
+.nearby-dist{font-size:16px;font-weight:700;color:var(--teal)}
+.action-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.action-btn{padding:14px 8px;border-radius:16px;background:rgba(255,255,255,0.06);border:1.5px solid var(--bdr);
+  color:var(--t);font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:all 0.15s}
+.action-btn:active{transform:scale(0.95);background:rgba(255,255,255,0.1)}
+.action-btn .ico{font-size:24px;display:block;margin-bottom:4px}
+.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+.dot-green{background:var(--green);box-shadow:0 0 8px rgba(48,209,88,0.4)}
+.dot-red{background:var(--red);box-shadow:0 0 8px rgba(255,69,58,0.4)}
+.dot-orange{background:var(--orange);box-shadow:0 0 8px rgba(255,159,10,0.4)}
+.back-bar{margin-bottom:10px}
+.back-btn{padding:8px 14px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid var(--bdr);
+  color:var(--t);font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}
+.trip-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.trip-stat{text-align:center;padding:10px 4px;background:rgba(255,255,255,0.03);border-radius:12px}
+.trip-val{font-size:16px;font-weight:700}
+.trip-lbl{font-size:9px;color:var(--t2);margin-top:2px;text-transform:uppercase;letter-spacing:0.3px}
+</style>
+</head>
+<body>
+<div class="back-bar"><a href="index.html" class="back-btn">← Menü</a></div>
+<div class="header"><h1>🧭 Co-Pilot</h1></div>
+
+<div class="speed-display">
+  <div class="speed-num" id="speed">--</div>
+  <div class="speed-unit">km/h</div>
+</div>
+
+<div class="trip-stats">
+  <div class="trip-stat"><div class="trip-val" id="tripKm">0</div><div class="trip-lbl">km</div></div>
+  <div class="trip-stat"><div class="trip-val" id="tripTime">0:00</div><div class="trip-lbl">Zeit</div></div>
+  <div class="trip-stat"><div class="trip-val" id="tripAvg">--</div><div class="trip-lbl">Ø km/h</div></div>
+  <div class="trip-stat"><div class="trip-val" id="tripMax">0</div><div class="trip-lbl">Max</div></div>
+</div>
+
+<div class="grid">
+  <div class="card"><div class="card-icon">📍</div><div class="card-val" id="gpsAcc">--</div><div class="card-lbl">GPS Genauigkeit</div></div>
+  <div class="card"><div class="card-icon">⛽</div><div class="card-val" id="fuelEst">--</div><div class="card-lbl">Ø Spritpreis</div></div>
+  <div class="card"><div class="card-icon">🌡️</div><div class="card-val" id="alt">--</div><div class="card-lbl">Höhe</div></div>
+  <div class="card"><div class="card-icon">🧭</div><div class="card-val" id="heading">--</div><div class="card-lbl">Richtung</div></div>
+</div>
+
+<div class="action-btns">
+  <div class="action-btn" onclick="window.location.href='fuel.html'"><span class="ico">⛽</span>Tanken</div>
+  <div class="action-btn" onclick="window.location.href='kids.html'"><span class="ico">🎮</span>Spiel</div>
+  <div class="action-btn" onclick="toggleTrip()"><span class="ico">📊</span><span id="tripBtn">Trip Start</span></div>
+</div>
+
+<div class="nearby" id="nearbySection">
+  <div class="nearby-title"><span class="status-dot dot-green"></span> In der Nähe</div>
+  <div id="nearbyList"><div style="text-align:center;padding:20px;color:var(--t2)">GPS aktivieren für Standort-basierte Infos</div></div>
+</div>
+
+<script>
+let watchId = null, lastPos = null, tripStart = null, tripDist = 0, tripMaxSpeed = 0, tripActive = false;
+const directions = ['N','NO','O','SO','S','SW','W','NW'];
+
+function init() {
+  if (!navigator.geolocation) { document.getElementById('speed').textContent = 'N/A'; return; }
+  watchId = navigator.geolocation.watchPosition(onPos, onErr, { enableHighAccuracy: true, maximumAge: 1000 });
+}
+
+function onPos(pos) {
+  const { latitude: lat, longitude: lng, speed, accuracy, altitude, heading } = pos.coords;
+  const speedKmh = speed ? Math.round(speed * 3.6) : 0;
+  
+  document.getElementById('speed').textContent = speedKmh;
+  document.getElementById('gpsAcc').textContent = Math.round(accuracy) + 'm';
+  document.getElementById('alt').textContent = altitude ? Math.round(altitude) + 'm' : '--';
+  
+  if (heading != null && !isNaN(heading)) {
+    const dir = directions[Math.round(heading / 45) % 8];
+    document.getElementById('heading').textContent = Math.round(heading) + '° ' + dir;
+  }
+  
+  // Trip tracking
+  if (tripActive && lastPos) {
+    const d = haversine(lastPos.lat, lastPos.lng, lat, lng);
+    if (d > 0.01 && d < 1) { // filter GPS noise
+      tripDist += d;
+      document.getElementById('tripKm').textContent = tripDist.toFixed(1);
+    }
+    if (speedKmh > tripMaxSpeed) {
+      tripMaxSpeed = speedKmh;
+      document.getElementById('tripMax').textContent = tripMaxSpeed;
+    }
+    if (tripStart) {
+      const mins = Math.floor((Date.now() - tripStart) / 60000);
+      const hrs = Math.floor(mins / 60);
+      const remMins = mins % 60;
+      document.getElementById('tripTime').textContent = hrs > 0 ? hrs + ':' + String(remMins).padStart(2,'0') : remMins + 'min';
+      if (tripDist > 0) {
+        const hrsElapsed = (Date.now() - tripStart) / 3600000;
+        document.getElementById('tripAvg').textContent = Math.round(tripDist / hrsElapsed);
+      }
+    }
+  }
+  
+  lastPos = { lat, lng };
+  
+  // Update nearby
+  updateNearby(lat, lng);
+}
+
+function onErr(err) {
+  console.warn('GPS error:', err);
+  document.getElementById('speed').textContent = '❌';
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function toggleTrip() {
+  tripActive = !tripActive;
+  if (tripActive) {
+    tripStart = Date.now();
+    tripDist = 0;
+    tripMaxSpeed = 0;
+    document.getElementById('tripBtn').textContent = 'Stop';
+  } else {
+    document.getElementById('tripBtn').textContent = 'Trip Start';
+  }
+}
+
+async function updateNearby(lat, lng) {
+  // Use cached fuel stations or show static content
+  const list = document.getElementById('nearbyList');
+  const cached = localStorage.getItem('fuel_stations');
+  let html = '';
+  
+  if (cached) {
+    try {
+      const data = JSON.parse(cached);
+      if (data.d?.stations?.length) {
+        const stations = data.d.stations.slice(0, 3);
+        stations.forEach(s => {
+          html += '<div class="nearby-item"><div class="nearby-icon">⛽</div><div class="nearby-info"><div class="nearby-name">' + (s.brand || s.name) + '</div><div class="nearby-detail">' + (s.street || '') + ', ' + (s.place || '') + '</div></div><div class="nearby-dist">' + s.dist + 'km</div></div>';
+        });
+      }
+    } catch(e) {}
+  }
+  
+  // Static nearby info
+  html += '<div class="nearby-item"><div class="nearby-icon">🏕️</div><div class="nearby-info"><div class="nearby-name">Stellplatz-Suche</div><div class="nearby-detail">Über Tanken → Europa-Preise</div></div><div class="nearby-dist">→</div></div>';
+  html += '<div class="nearby-item"><div class="nearby-icon">🎮</div><div class="nearby-info"><div class="nearby-name">Kids Spiel starten</div><div class="nearby-detail">I Spy Challenges für unterwegs</div></div><div class="nearby-dist">→</div></div>';
+  
+  if (html) list.innerHTML = html;
+}
+
+init();
+</script>
+</body>
+</html>
